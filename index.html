@@ -1264,7 +1264,7 @@ button { cursor: pointer; }
   <div class="modal-backdrop" onclick="closeMapCreationModal()"></div>
   <div class="modal-card modal-card--xl">
     <div class="modal-header">
-      <div class="modal-title">Map Creation — Tree Detection &amp; Selection</div>
+      <div class="modal-title">Map Creation - Tree Detection &amp; Selection</div>
       <button class="btn" onclick="closeMapCreationModal()">✕ Close</button>
     </div>
     <div class="modal-body">
@@ -1274,7 +1274,7 @@ button { cursor: pointer; }
         <div style="flex:1;display:flex;flex-direction:column;gap:6px;min-width:0;">
           <div class="mc-toolbar">
             <div class="tip" data-tip="Run YOLO detection">
-              <button class="btn btn-sm" onclick="runYoloDetection()">⚡ Detect</button>
+              <button class="btn btn-sm" onclick="runYoloDetection()">Auto Detect</button>
             </div>
             <div class="tip" data-tip="Click to place tree manually">
               <button class="btn btn-sm" onclick="setMapMode('manual')" id="btnModeManual">＋ Manual</button>
@@ -1360,7 +1360,7 @@ button { cursor: pointer; }
       </div>
 
       <div class="mission-section">
-        <button class="btn btn-full" onclick="computeMissionPath()">⟳ Compute Path (Dijkstra)</button>
+        <button class="btn btn-full" onclick="computeMissionPath()">⟳ Compute Optimal Path</button>
       </div>
 
       <div id="missionPathPreview" class="mission-path-preview hidden">
@@ -1398,8 +1398,8 @@ button { cursor: pointer; }
           <div id="waypointProgress"></div>
         </div>
         <div class="flex gap-6">
-          <button class="btn btn-accent flex-1" onclick="uploadMissionToDrone()">📡 Upload to Drone</button>
-          <button class="btn btn-danger flex-1" onclick="abortMission()">⛔ Abort</button>
+          <button class="btn btn-accent flex-1" onclick="uploadMissionToDrone()">Upload to Drone</button>
+          <button class="btn btn-danger flex-1" onclick="abortMission()">Abort</button>
         </div>
       </div>
     </div>
@@ -1450,7 +1450,7 @@ button { cursor: pointer; }
       </div>
       <div class="flex gap-6" style="justify-content:flex-end;margin-top:14px;">
         <button class="btn" onclick="closeConnectModal()">Cancel</button>
-        <button class="btn btn-accent" onclick="connectToDrone()">🔌 Connect</button>
+        <button class="btn btn-accent" onclick="connectToDrone()">Connect</button>
       </div>
     </div>
   </div>

@@ -50,27 +50,14 @@
 [data-theme="Abyss"] {
   --bg:           #0e0820;
   --surface:      #160f30;
-  --surface-2:    #1e1540;
+  --surface-2:    #251f3a;
   --border:       #2a1f54;
   --border-light: #3a2d6a;
   --text:         #d4c8f0;
-  --muted:        #6450a8;
-  --accent:       #c478ff;
+  --muted:        #7767af;
+  --accent:       #3dffa1;
   --accent-dim:   rgba(196,120,255,.14);
   --accent-glow:  rgba(196,120,255,.28);
-}
-
-[data-theme="amber"] {
-  --bg:           #120d04;
-  --surface:      #1c1508;
-  --surface-2:    #261e0e;
-  --border:       #3a2c10;
-  --border-light: #4e3c18;
-  --text:         #e8d8b0;
-  --muted:        #7a6040;
-  --accent:       #ffb43d;
-  --accent-dim:   rgba(255,180,61,.14);
-  --accent-glow:  rgba(255,180,61,.28);
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -1082,7 +1069,6 @@ button { cursor: pointer; }
         <button type="button" onclick="setTheme('dark','Dark')">Dark</button>
         <button type="button" onclick="setTheme('light','Light')">Light</button>
         <button type="button" onclick="setTheme('abyss','Abyss')">Abyss</button>
-        <button type="button" onclick="setTheme('amber','Amber')">Amber</button>
       </div>
     </div>
 
@@ -1223,7 +1209,6 @@ button { cursor: pointer; }
     <button class="drawer-item" onclick="setTheme('dark','Dark'); closeDrawer()">Dark</button>
     <button class="drawer-item" onclick="setTheme('light','Light'); closeDrawer()">Light</button>
     <button class="drawer-item" onclick="setTheme('Abyss','Abyss'); closeDrawer()">Abyss</button>
-    <button class="drawer-item" onclick="setTheme('amber','Amber'); closeDrawer()">Amber</button>
   </div>
 </div>
 

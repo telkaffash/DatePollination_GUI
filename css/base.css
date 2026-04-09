@@ -100,14 +100,139 @@ body{
 .layout {
   display: grid;
   grid-template-columns: 1.1fr 0.9fr;
-  grid-template-rows: auto auto;
   gap: 14px;
   padding: 14px;
+
+  /* important */
+  align-items: start;
 }
 
 .right-column {
   display: grid;
   gap: 15px;
+  align-content: start;
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  min-height: 0;
+}
+
+.panel-map {
+  min-height: 420px;
+}
+
+.panel-terminal {
+  grid-column: 1 / -1;
+}
+
+/* let the page scroll naturally */
+html, body {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  overflow-y: auto;
+}
+
+/* avoid forcing internal shrinking */
+.map-placeholder {
+  min-height: 420px;
+  height: 420px;
+  border: 0px dashed var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+}
+
+.camera-placeholder {
+  min-height: 320px;
+  height: 320px;
+  border: 1px dashed var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+}
+
+.map-stage {
+  position: relative;
+  min-height: 420px;
+  height: 420px;
+  border: 1px dashed var(--border);
+  overflow: hidden;
+  border-radius: 10px;
+  background: rgba(0,0,0,0.15);
+}
+
+/* ===== MOBILE ===== */
+@media (max-width: 900px) {
+  .layout {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding: 12px;
+  }
+
+  .right-column {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .panel-terminal {
+    grid-column: auto;
+  }
+
+  .panel,
+  .panel-map,
+  .panel-terminal {
+    flex-shrink: 0;
+  }
+
+  .map-placeholder,
+  .map-stage {
+    min-height: 300px;
+    height: 300px;
+  }
+
+  .camera-placeholder {
+    min-height: 220px;
+    height: 220px;
+  }
+
+  .vitals {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .layout {
+    padding: 10px;
+    gap: 10px;
+  }
+
+  .map-placeholder,
+  .map-stage {
+    min-height: 260px;
+    height: 260px;
+  }
+
+  .camera-placeholder {
+    min-height: 180px;
+    height: 180px;
+  }
+
+  .vitals {
+    grid-template-columns: 1fr;
+  }
+
+  .terminal-log {
+    height: 160px;
+  }
 }
 
 .panel {
@@ -165,14 +290,18 @@ body{
 
 /* ===== TERMINAL ===== */
 .terminal-log {
-  height: 180px;
-  background: var(--terminal-bg);
-  border: 1px solid var(--border);
-  font-family: monospace;
-  font-variant: normal;
-  font-size: 12px;
+  flex: 1;
+  min-height: 280px;
+  height: 280px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.7;
   overflow-y: auto;
-  padding: 8px;
+  padding: 8px 10px;
+  background: var(--bg);
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  color: var(--text);
 }
 
 .terminal-input {

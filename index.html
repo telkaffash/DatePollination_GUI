@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>SDP — Pollination Control</title>
+  <title>Thamar: Date Pollination System</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -47,7 +47,7 @@
   --accent-glow:  rgba(0,184,107,.22);
 }
 
-[data-theme="purple"] {
+[data-theme="Abyss"] {
   --bg:           #0e0820;
   --surface:      #160f30;
   --surface-2:    #1e1540;
@@ -860,7 +860,7 @@ button { cursor: pointer; }
 .mission-list-item .mi-meta { color: var(--muted); font-size: 11px; margin-top: 2px; font-family: var(--font-mono); }
 .mission-list-item .mi-actions { display: flex; gap: 5px; flex-shrink: 0; }
 
-/* ── Waypoint list ────────────────────────────────────────── */
+/* === Waypoint list === */
 .waypoint-row {
   display: flex;
   align-items: center;
@@ -1080,7 +1080,7 @@ button { cursor: pointer; }
       <div class="dropdown-menu dropdown-menu-right">
         <button type="button" onclick="setTheme('dark','Dark')">Dark</button>
         <button type="button" onclick="setTheme('light','Light')">Light</button>
-        <button type="button" onclick="setTheme('purple','Purple')">Abyss</button>
+        <button type="button" onclick="setTheme('abyss','Abyss')">Abyss</button>
         <button type="button" onclick="setTheme('amber','Amber')">Amber</button>
       </div>
     </div>
@@ -1219,10 +1219,10 @@ button { cursor: pointer; }
     <button class="drawer-item" onclick="openConnectModal(); closeDrawer()">🔌 Connect Client</button>
 
     <div class="drawer-section">Theme</div>
-    <button class="drawer-item" onclick="setTheme('dark','Dark'); closeDrawer()">🌑 Dark</button>
-    <button class="drawer-item" onclick="setTheme('light','Light'); closeDrawer()">☀️ Light</button>
-    <button class="drawer-item" onclick="setTheme('purple','Purple'); closeDrawer()">💜 Purple</button>
-    <button class="drawer-item" onclick="setTheme('amber','Amber'); closeDrawer()">🟡 Amber</button>
+    <button class="drawer-item" onclick="setTheme('dark','Dark'); closeDrawer()">Dark</button>
+    <button class="drawer-item" onclick="setTheme('light','Light'); closeDrawer()">Light</button>
+    <button class="drawer-item" onclick="setTheme('Abyss','Abyss'); closeDrawer()">Abyss</button>
+    <button class="drawer-item" onclick="setTheme('amber','Amber'); closeDrawer()">Amber</button>
   </div>
 </div>
 

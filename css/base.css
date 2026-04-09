@@ -1,0 +1,316 @@
+body{
+  margin: 0;
+
+  font-family: var(--font-ui, "Segoe UI", system-ui, Arial, sans-serif);
+  font-weight: var(--font-weight, 400);
+  font-style: var(--font-style, normal);
+  font-variant: var(--font-variant, normal);
+  text-transform: var(--text-transform, none);
+
+  background: var(--bg);
+  color: var(--text);
+}
+
+.topbar{
+  display:flex;
+  align-items:center;
+  gap:12px;       
+  padding: 6px 10px;  
+  background: var(--topbar);
+  border-bottom: 1px solid var(--border);
+  border-radius: 5px;
+}
+
+.topbar-left{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex: 0 0 auto;
+}
+
+.topbar-right{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  justify-content:flex-end;
+  flex: 1 1 auto;      /* takes remaining width */
+  flex-wrap: nowrap;   /* stays one row */
+}
+
+.app-icon {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  /* border: 0px solid var(--border); */
+  /* border-radius: 999px; */
+}
+
+.btn {
+  background: var(--btn-bg);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  color: var(--text);
+  padding: 6px 10px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.dropdown {
+  position: relative;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: auto;
+  min-width: 200px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  display: none;
+  z-index: 100;
+}
+
+.dropdown-menu .disabled { opacity: 0.5; pointer-events: none; }
+
+.dropdown.open .dropdown-menu { display: block; }
+
+.dropdown-menu button {
+  width: 100%;
+  padding: 6px 8px;
+  background: none;
+  border: none;
+  color: var(--text);
+  text-align: left;
+}
+
+.menu-group {
+  padding: 6px 8px;
+  font-size: 10px;
+  color: var(--muted);
+}
+
+/* ===== MAIN LAYOUT ===== */
+.layout {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  grid-template-rows: auto auto;
+  gap: 14px;
+  padding: 14px;
+}
+
+.right-column {
+  display: grid;
+  gap: 15px;
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.panel-map { min-height: 420px; }
+
+.panel-terminal {
+  grid-column: 1 / span 2;
+}
+
+/* ===== PANEL CONTENT ===== */
+.panel-header {
+  padding: 6px 12px;
+  border-bottom: 1px solid var(--border);
+  font-weight: 500;
+}
+
+.panel-body { padding: 10px; }
+
+/* ===== PLACEHOLDERS ===== */
+.map-placeholder {
+  height: 420px;
+  border: 0px dashed var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+}
+
+.camera-placeholder {
+  height: 320px;
+  border: 1px dashed var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+}
+
+/* ===== VITALS ===== */
+.vitals {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.stat {
+  border: 1px solid var(--border);
+  padding: 5px;
+  font-size: 16px;
+}
+
+/* ===== TERMINAL ===== */
+.terminal-log {
+  height: 180px;
+  background: var(--terminal-bg);
+  border: 1px solid var(--border);
+  font-family: monospace;
+  font-variant: normal;
+  font-size: 12px;
+  overflow-y: auto;
+  padding: 8px;
+}
+
+.terminal-input {
+  margin-top: 6px;
+  display: flex;
+  gap: 6px;
+}
+
+.terminal-input input {
+  flex: 1;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+.hidden { display: none !important; }
+
+/* ===== Farm Addition Modal ===== */
+.hidden { 
+  display: none !important; 
+}
+
+.modal{
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+}
+
+.modal-backdrop{
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+}
+
+.modal-card{
+  position: relative;
+  width: min(1000px, 92vw);
+  max-height: 80vh;
+  margin: 60px auto;
+  overflow: auto;
+
+  background: var(--panel, #1e1e1e);
+  color: var(--text, #ffffff);
+  border: 1px solid var(--border, #444);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.45);
+  border-radius: 18px;
+}
+
+.modal-header{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--border, #444);
+}
+
+.modal-title{
+  font-weight: 700;
+}
+
+.modal-body{
+  padding: 20px;
+}
+
+.calib-canvas-wrap {
+  width: 100%;
+  min-height: 260px;
+  border: 1px solid var(--border);
+  position: relative;
+  border-radius: 12px;
+}
+
+#calibCanvas { display: block; }
+.overlay-hint {
+  position: absolute;
+  left: 12px;
+  top: 12px;
+  opacity: 0.8;
+}
+
+.map-stage{
+  position: relative;
+  height: 420px;                 
+  border: 1px dashed var(--border);
+  overflow: hidden;
+  border-radius: 10px;           
+  background: rgba(0,0,0,0.15); 
+}
+
+.farm-map-img{
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;             
+  object-position: center;    
+  display: block;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+#mapOverlay{
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  pointer-events: none;     /* clicks go through */
+}
+
+#mapEmptyHint{
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+}
+
+/* Drone markers (on top of everything) */
+.drone-dot{
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  background: #ffcc00;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 0 6px rgba(255,204,0,0.18);
+  pointer-events: none;
+  z-index: 10;
+}
+
+.drone-marker{
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  user-select: none;
+  z-index: 10;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.45));
+}

@@ -1,0 +1,63 @@
+{
+  "name": "unnamed-mission",
+  "trees": [
+    {
+      "id": 0,
+      "cx": 251,
+      "cy": 212,
+      "w": 36,
+      "h": 36,
+      "manual": true
+    },
+    {
+      "id": 1,
+      "cx": 423,
+      "cy": 224,
+      "w": 36,
+      "h": 36,
+      "manual": true
+    },
+    {
+      "id": 2,
+      "cx": 215,
+      "cy": 372,
+      "w": 36,
+      "h": 36,
+      "manual": true
+    }
+  ],
+  "order": [
+    0,
+    2,
+    1
+  ],
+  "waypoints": [
+    {
+      "cx": 251,
+      "cy": 212,
+      "h": 36,
+      "id": 0,
+      "manual": true,
+      "w": 36
+    },
+    {
+      "cx": 215,
+      "cy": 372,
+      "h": 36,
+      "id": 2,
+      "manual": true,
+      "w": 36
+    },
+    {
+      "cx": 423,
+      "cy": 224,
+      "h": 36,
+      "id": 1,
+      "manual": true,
+      "w": 36
+    }
+  ],
+  "farm": "ARS_Test1",
+  "id": "0c779016",
+  "createdAt": "2026-03-26T04:52:36.021109"
+}

@@ -1,0 +1,24 @@
+:root {
+  --bg: linear-gradient(90deg, #170347 0%, #2a3867 55%, #152258 100%);
+  --panel: #38158361;
+  --topbar: linear-gradient(90deg, #2d0a7c 0%, #4b5e9c 55%, #296b81 100%);
+  --border: #3f1386;
+
+  --text: #f4f6fb;
+  --muted: #c9d1dd;
+
+  --btn-bg: rgba(255, 255, 255, 0.10);
+  --terminal-bg: rgba(20, 20, 35, 0.35);
+
+  --font-ui: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+             "Cascadia Code", "Cascadia Mono", "JetBrains Mono", "Fira Code",
+             "Source Code Pro", "Liberation Mono", "Courier New", monospace;
+}
+
+.main-panel {
+  background: var(--panel);
+  border: 2px solid var(--border);
+  border-radius: 28px;
+  color: var(--text);
+}
+

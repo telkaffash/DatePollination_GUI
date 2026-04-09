@@ -1,0 +1,19 @@
+:root {
+  --bg: #f6f4ec;
+  --panel: #eae8e1;
+  --topbar: #eae8e1;
+  --border: 	#d1d1d1;
+
+  --text: #3b2e2e;
+  --muted: #292222;
+
+  --btn-bg: hsl(45, 8%, 81%);
+  --terminal-bg: #f6f4ec;
+
+    --font-ui: Georgia, Cambria, "Times New Roman", Times, serif;
+
+  --font-weight: 400;
+  --font-style: normal;
+  --font-variant: small-caps;
+  --text-transform: none;
+}

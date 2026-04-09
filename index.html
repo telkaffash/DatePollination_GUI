@@ -1,0 +1,2560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>SDP — Pollination Control</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet" />
+
+<style>
+
+/* ============ MOVE THIS TO CSS LATER ============ */
+:root {
+  --bg:           #0d0f14;
+  --surface:      #13161d;
+  --surface-2:    #1a1e28;
+  --border:       #252a38;
+  --border-light: #2e3547;
+  --text:         #c8cedc;
+  --muted:        #5a6278;
+  --accent:       #3dff9a;
+  --accent-dim:   rgba(61,255,154,.14);
+  --accent-glow:  rgba(61,255,154,.28);
+  --warn:         #ffaa3d;
+  --danger:       #ff5a5a;
+  --info:         #3d9aff;
+  --topbar-h:     52px;
+  --radius:       10px;
+  --radius-lg:    16px;
+  --font-ui:      'Syne', system-ui, sans-serif;
+  --font-mono:    'Space Mono', monospace;
+  --transition:   .18s cubic-bezier(.4,0,.2,1);
+}
+
+/* Light theme */
+[data-theme="light"] {
+  --bg:           #f0f2f7;
+  --surface:      #ffffff;
+  --surface-2:    #e8eaf2;
+  --border:       #d0d4e0;
+  --border-light: #c0c6d6;
+  --text:         #1a1e2e;
+  --muted:        #8890a8;
+  --accent:       #00b86b;
+  --accent-dim:   rgba(0,184,107,.1);
+  --accent-glow:  rgba(0,184,107,.22);
+}
+
+[data-theme="purple"] {
+  --bg:           #0e0820;
+  --surface:      #160f30;
+  --surface-2:    #1e1540;
+  --border:       #2a1f54;
+  --border-light: #3a2d6a;
+  --text:         #d4c8f0;
+  --muted:        #6450a8;
+  --accent:       #c478ff;
+  --accent-dim:   rgba(196,120,255,.14);
+  --accent-glow:  rgba(196,120,255,.28);
+}
+
+[data-theme="amber"] {
+  --bg:           #120d04;
+  --surface:      #1c1508;
+  --surface-2:    #261e0e;
+  --border:       #3a2c10;
+  --border-light: #4e3c18;
+  --text:         #e8d8b0;
+  --muted:        #7a6040;
+  --accent:       #ffb43d;
+  --accent-dim:   rgba(255,180,61,.14);
+  --accent-glow:  rgba(255,180,61,.28);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body { height: 100%; }
+
+body {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+  transition: background var(--transition), color var(--transition);
+}
+
+input, button, select, textarea { font-family: inherit; font-size: inherit; }
+button { cursor: pointer; }
+
+   /* ============ SCROLLBAR ============*/
+::-webkit-scrollbar            { width: 5px; height: 5px; }
+::-webkit-scrollbar-track      { background: transparent; }
+::-webkit-scrollbar-thumb      { background: var(--border-light); border-radius: 9px; }
+::-webkit-scrollbar-thumb:hover{ background: var(--muted); }
+
+/* ============ UTILITY ============ */
+.hidden { display: none !important; }
+.flex   { display: flex; }
+.flex-1 { flex: 1; }
+.gap-4  { gap: 4px; }
+.gap-6  { gap: 6px; }
+.gap-8  { gap: 8px; }
+
+/* ============ TOPBAR ============ */
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 12px;
+  height: var(--topbar-h);
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  flex-shrink: 0;
+}
+
+.topbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.brand-icon {
+  font-size: 22px;
+  line-height: 1;
+  filter: drop-shadow(0 0 8px var(--accent-glow));
+}
+
+.brand-title {
+  font-weight: 800;
+  font-size: 14px;
+  letter-spacing: .04em;
+  color: var(--text);
+  white-space: nowrap;
+}
+
+.brand-sub {
+  font-size: 10px;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  white-space: nowrap;
+}
+
+.topbar-sep {
+  width: 1px;
+  height: 28px;
+  background: var(--border);
+  flex-shrink: 0;
+}
+
+.topbar-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+/* ============ Hamburger – mobile only ============ */
+.menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--text);
+  padding: 6px;
+  font-size: 20px;
+  line-height: 1;
+}
+
+/* ============ BUTTONS ============ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 11px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border-light);
+  background: var(--surface-2);
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: background var(--transition), border-color var(--transition), color var(--transition), box-shadow var(--transition);
+  user-select: none;
+}
+.btn:hover:not(:disabled) {
+  background: var(--border);
+  border-color: var(--border-light);
+}
+.btn:disabled { opacity: .4; cursor: not-allowed; }
+
+.btn-sm  { padding: 4px 9px; font-size: 11px; }
+.btn-lg  { padding: 8px 16px; font-size: 13px; }
+.btn-full{ width: 100%; justify-content: center; }
+
+.btn-accent {
+  background: var(--accent-dim);
+  border-color: var(--accent-glow);
+  color: var(--accent);
+}
+.btn-accent:hover:not(:disabled) {
+  background: rgba(61,255,154,.25);
+  box-shadow: 0 0 12px var(--accent-glow);
+}
+
+.btn-danger {
+  background: rgba(255,90,90,.08);
+  border-color: rgba(255,90,90,.25);
+  color: var(--danger);
+}
+.btn-danger:hover:not(:disabled) {
+  background: rgba(255,90,90,.18);
+}
+
+.btn-icon {
+  padding: 5px 8px;
+  font-size: 14px;
+}
+
+/* ============ DROPDOWN ============ */
+.dropdown { position: relative; }
+
+.dropdown-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  min-width: 200px;
+  background: var(--surface);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  box-shadow: 0 8px 32px rgba(0,0,0,.45);
+  z-index: 300;
+  display: none;
+  overflow: hidden;
+  animation: dropIn .15s ease;
+}
+
+@keyframes dropIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.dropdown.open .dropdown-menu { display: block; }
+
+.dropdown-menu button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 12px;
+  background: none;
+  border: none;
+  color: var(--text);
+  font-size: 12px;
+  text-align: left;
+  font-family: var(--font-ui);
+  transition: background var(--transition);
+}
+.dropdown-menu button:hover { background: var(--surface-2); }
+.dropdown-menu button.disabled { opacity: .35; pointer-events: none; }
+
+.menu-group {
+  padding: 6px 12px 3px;
+  font-size: 10px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 700;
+  border-top: 1px solid var(--border);
+}
+.menu-group:first-child { border-top: none; }
+
+.dropdown-menu-right {
+  left: auto;
+  right: 0;
+}
+
+/* ============ TOOLTIP ============ */
+.tip {
+  position: relative;
+  display: inline-flex;
+}
+.tip::after {
+  content: attr(data-tip);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  white-space: nowrap;
+  background: #0a0c10;
+  color: #dde;
+  font-size: 11px;
+  font-family: var(--font-mono);
+  padding: 4px 9px;
+  border-radius: 6px;
+  border: 1px solid var(--border-light);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .15s, transform .15s;
+  z-index: 9999;
+}
+.tip:hover::after { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ============ PLAYBACK GROUP ============ */
+.playback-group {
+  display: flex;
+  gap: 2px;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.playback-group .btn {
+  border: none;
+  border-radius: 0;
+  background: var(--surface-2);
+}
+.playback-group .btn:hover:not(:disabled) { background: var(--border); }
+
+/* ============ MAIN LAYOUT ============ */
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  grid-template-rows: 1fr auto;
+  gap: 12px;
+  padding: 12px;
+  flex: 1;
+  min-height: 0;
+}
+
+/* ============ PANEL ============ */
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.panel-title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.panel-body { padding: 10px; flex: 1; display: flex; flex-direction: column; min-height: 0; }
+
+/* ============ Map panel ============ */
+.panel-map { grid-row: 1; min-height: 380px; }
+
+.map-stage {
+  flex: 1;
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  min-height: 320px;
+  cursor: grab;
+}
+.map-stage:active { cursor: grabbing; }
+
+.farm-map-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+#mapOverlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.map-empty-hint {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+  font-size: 12px;
+  font-family: var(--font-mono);
+  text-align: center;
+  gap: 8px;
+  flex-direction: column;
+}
+
+.map-empty-hint .hint-icon { font-size: 40px; opacity: .2; display: block; margin-bottom: 8px; }
+
+.map-controls {
+  display: flex;
+  gap: 6px;
+  padding: 6px 10px;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+
+/* ============ Right column ============ */
+.right-col {
+  grid-row: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 0;
+}
+
+/* ============ Camera panel ============  */
+.camera-placeholder {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  background: var(--surface-2);
+  border-radius: 8px;
+  border: 1px dashed var(--border-light);
+  min-height: 160px;
+  flex-direction: column;
+  gap: 6px;
+}
+.camera-placeholder .cam-icon { font-size: 28px; opacity: .2; }
+
+/* ============ Vitals panel ============ */
+.vitals-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.stat-card {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.stat-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.stat-value {
+  font-size: 20px;
+  font-weight: 800;
+  font-family: var(--font-mono);
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+.stat-value.na { color: var(--muted); font-size: 14px; }
+
+/* ============ Terminal panel ============ */
+.panel-terminal {
+  grid-column: 1 / -1;
+  flex-direction: column;
+}
+
+.terminal-log {
+  flex: 1;
+  height: 160px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.7;
+  overflow-y: auto;
+  padding: 8px 10px;
+  background: var(--bg);
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+.terminal-log .log-ok   { color: var(--accent); }
+.terminal-log .log-err  { color: var(--danger); }
+.terminal-log .log-warn { color: var(--warn); }
+.terminal-log .log-info { color: var(--info); }
+
+.terminal-input-row {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.terminal-input-row input {
+  flex: 1;
+  background: var(--surface-2);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  color: var(--text);
+  padding: 6px 10px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  outline: none;
+  transition: border-color var(--transition);
+}
+.terminal-input-row input:focus { border-color: var(--accent); }
+.terminal-input-row input::placeholder { color: var(--muted); }
+
+/* ============ MODAL ============ */
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 24px 12px 12px;
+}
+
+.modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,.6);
+  backdrop-filter: blur(4px);
+}
+
+.modal-card {
+  position: relative;
+  width: min(960px, 94vw);
+  max-height: 88vh;
+  overflow-y: auto;
+  background: var(--surface);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 24px 80px rgba(0,0,0,.6);
+  animation: modalIn .2s cubic-bezier(.4,0,.2,1);
+}
+
+@keyframes modalIn {
+  from { opacity: 0; transform: translateY(-16px) scale(.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.modal-card--sm  { width: min(440px, 94vw); }
+.modal-card--md  { width: min(580px, 94vw); }
+.modal-card--xl  { width: min(960px, 94vw); }
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  background: var(--surface);
+  z-index: 1;
+}
+
+.modal-title { font-size: 15px; font-weight: 800; }
+
+.modal-body { padding: 18px; }
+
+/* ============ FORM ============ */
+.form-field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; }
+.form-field:last-child { margin-bottom: 0; }
+
+.label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.input {
+  padding: 8px 12px;
+  background: var(--surface-2);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-size: 13px;
+  font-family: var(--font-ui);
+  outline: none;
+  transition: border-color var(--transition);
+  width: 100%;
+}
+.input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim); }
+.input::placeholder { color: var(--muted); }
+
+.error {
+  font-size: 11px;
+  color: var(--danger);
+  font-family: var(--font-mono);
+  min-height: 14px;
+}
+
+/* ── Farm modal calibration grid ─────────────────────────── */
+.calib-grid {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.calib-canvas-wrap {
+  position: relative;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--surface-2);
+  min-height: 240px;
+}
+
+.overlay-hint {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  font-size: 12px;
+  font-family: var(--font-mono);
+  pointer-events: none;
+}
+
+.calib-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.calib-right { display: flex; flex-direction: column; gap: 10px; }
+
+.points-list {
+  flex: 1;
+  max-height: 280px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.hint {
+  font-size: 11px;
+  color: var(--muted);
+  font-family: var(--font-mono);
+}
+
+.point-row {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.point-grid {
+  display: grid;
+  grid-template-columns: auto 1fr auto 1fr;
+  gap: 4px 8px;
+  align-items: center;
+  margin-top: 6px;
+}
+
+/* ================================================================
+   MAP CREATION MODAL
+================================================================ */
+.mc-layout {
+  display: flex;
+  gap: 14px;
+  min-height: 480px;
+}
+
+.mc-toolbar {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+.mc-mode-label {
+  margin-left: auto;
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: var(--muted);
+}
+
+.mc-canvas-wrap {
+  position: relative;
+  flex: 1;
+  min-height: 360px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  cursor: crosshair;
+}
+
+.mc-status {
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: var(--muted);
+  height: 16px;
+  margin-top: 4px;
+}
+
+.mc-sidebar {
+  width: 210px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.mc-tree-list {
+  max-height: 180px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 11px;
+}
+
+.mc-tree-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background var(--transition);
+}
+.mc-tree-row:hover { background: var(--surface-2); }
+.mc-tree-row.selected { background: var(--accent-dim); color: var(--accent); }
+
+.mc-tree-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--muted);
+  flex-shrink: 0;
+}
+.mc-tree-row.selected .mc-tree-dot { background: var(--accent); }
+
+.mc-empty { font-size: 11px; color: var(--muted); font-family: var(--font-mono); padding: 4px; }
+
+/* ================================================================
+   MISSION MODAL
+================================================================ */
+.mission-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+}
+
+.mission-tab-btn {
+  flex: 1;
+  padding: 10px;
+  font-size: 12px;
+  font-weight: 700;
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: color var(--transition), border-color var(--transition);
+  font-family: var(--font-ui);
+  letter-spacing: .04em;
+}
+.mission-tab-btn:hover { color: var(--text); }
+.mission-tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+.mission-tab-body { padding: 14px 16px; }
+
+.mission-badge {
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  font-family: var(--font-mono);
+}
+.mission-badge--idle    { background: rgba(255,255,255,.06); color: var(--muted); }
+.mission-badge--planned { background: rgba(61,154,255,.15); color: var(--info); }
+.mission-badge--active  { background: var(--accent-dim); color: var(--accent); }
+.mission-badge--abort   { background: rgba(255,90,90,.15); color: var(--danger); }
+
+.mission-section { margin-bottom: 14px; }
+
+.tree-list-empty {
+  font-size: 11px;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  padding: 8px 0;
+  font-style: italic;
+}
+
+.mission-path-preview {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px;
+  margin-top: 6px;
+}
+
+.mission-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.mission-list-item {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background var(--transition);
+}
+.mission-list-item:hover { background: var(--border); }
+.mission-list-item .mi-name { font-weight: 700; }
+.mission-list-item .mi-meta { color: var(--muted); font-size: 11px; margin-top: 2px; font-family: var(--font-mono); }
+.mission-list-item .mi-actions { display: flex; gap: 5px; flex-shrink: 0; }
+
+/* ── Waypoint list ────────────────────────────────────────── */
+.waypoint-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 0;
+  font-size: 12px;
+  border-bottom: 1px solid var(--border);
+  font-family: var(--font-mono);
+}
+.waypoint-row:last-child { border-bottom: none; }
+
+.wp-num {
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: rgba(61,154,255,.18);
+  color: var(--info);
+  font-size: 10px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.wp-num.done { background: var(--accent-dim); color: var(--accent); }
+
+/* ================================================================
+   DRONE DOT
+================================================================ */
+.drone-dot {
+  position: absolute;
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: var(--accent);
+  transform: translate(-50%,-50%);
+  box-shadow: 0 0 0 5px var(--accent-glow);
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* ================================================================
+   STATUS BAR
+================================================================ */
+.status-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 4px 14px;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--muted);
+  flex-shrink: 0;
+}
+
+.status-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--muted);
+}
+.status-dot.ok { background: var(--accent); box-shadow: 0 0 4px var(--accent-glow); }
+
+/* ================================================================
+   MOBILE NAV DRAWER
+================================================================ */
+.mobile-drawer {
+  position: fixed;
+  inset: 0;
+  z-index: 400;
+  display: none;
+}
+.mobile-drawer.open { display: block; }
+.mobile-drawer-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,.5);
+}
+.mobile-drawer-panel {
+  position: absolute;
+  top: 0; right: 0;
+  width: 260px;
+  height: 100%;
+  background: var(--surface);
+  border-left: 1px solid var(--border);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+  animation: drawerIn .2s ease;
+}
+@keyframes drawerIn {
+  from { transform: translateX(100%); }
+  to   { transform: translateX(0); }
+}
+.drawer-close {
+  align-self: flex-end;
+  background: none;
+  border: none;
+  color: var(--text);
+  font-size: 18px;
+  padding: 4px;
+  margin-bottom: 8px;
+}
+.drawer-item {
+  display: block;
+  padding: 10px 12px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text);
+  font-weight: 600;
+  font-size: 13px;
+  text-align: left;
+  width: 100%;
+  font-family: var(--font-ui);
+  transition: background var(--transition);
+}
+.drawer-item:hover { background: var(--border); }
+.drawer-section { font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); padding: 10px 0 4px; }
+
+/* ======== RESPONSIVE ======================== */
+@media (max-width: 860px) {
+  .layout {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+  }
+  .right-col {
+    grid-row: 2;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .panel-terminal { grid-column: 1; grid-row: 3; }
+  .topbar-controls { display: none; }
+  .menu-toggle { display: flex; }
+  .topbar-right { margin-left: auto; }
+  .brand-sub { display: none; }
+}
+
+@media (max-width: 560px) {
+  .layout { padding: 8px; gap: 8px; }
+  .right-col { grid-template-columns: 1fr; }
+  .vitals-grid { grid-template-columns: 1fr 1fr; }
+  .calib-grid  { grid-template-columns: 1fr; }
+  .mc-layout   { flex-direction: column; }
+  .mc-sidebar  { width: 100%; }
+  .modal { padding: 8px; }
+  .modal-body { padding: 12px; }
+  .brand-title { font-size: 12px; }
+}
+</style>
+</head>
+
+<body>
+
+<!-- ===================================== TOPBAR ================================ -->
+<header class="topbar">
+  <div class="topbar-brand">
+    <div class="brand-icon">𒅒</div>
+    <div>
+      <div class="brand-title">SDP Pollination</div>
+      <div class="brand-sub">Host Control Console</div>
+    </div>
+  </div>
+
+  <div class="topbar-sep"></div>
+
+  <!-- Desktop controls -->
+  <div class="topbar-controls">
+
+    <!-- Farm -->
+    <div class="dropdown">
+      <button class="btn dropdown-toggle" type="button">
+        🌴 Farm: <span id="farmLabel">None</span>
+      </button>
+      <div class="dropdown-menu" id="farmMenu"></div>
+    </div>
+
+    <!-- Mission -->
+    <div class="dropdown">
+      <button class="btn dropdown-toggle" type="button">
+        📍 Mission: <span id="missionTopLabel">None</span>
+      </button>
+      <div class="dropdown-menu" id="missionMenu" style="min-width:220px;">
+        <div class="menu-group">Create</div>
+        <button type="button" onclick="startNewMissionFlow(); closeDropdowns();">New mission…</button>
+        <div class="menu-group">Load</div>
+        <div id="missionLoadMenuGroup">
+          <button class="disabled" type="button">No missions saved</button>
+        </div>
+        <div class="menu-group">Active</div>
+        <button class="disabled" type="button" id="missionTopStatus">No active mission</button>
+      </div>
+    </div>
+
+    <!-- Source -->
+    <div class="dropdown">
+      <button class="btn dropdown-toggle" type="button">
+        📡 Source: <span id="sourceLabel">None</span>
+      </button>
+      <div class="dropdown-menu">
+        <div class="menu-group">Replay</div>
+        <button type="button" onclick="openScenarioFile()">Load scenario…</button>
+        <div class="menu-group">Live</div>
+        <button type="button" onclick="openConnectModal()">Connect client…</button>
+        <div class="menu-group">Status</div>
+        <button class="disabled" type="button" id="sourceStatusItem">Not connected</button>
+      </div>
+    </div>
+
+    <!-- Theme -->
+    <div class="dropdown">
+      <button class="btn dropdown-toggle" type="button">
+        🎨 <span id="themeLabel">Dark</span>
+      </button>
+      <div class="dropdown-menu dropdown-menu-right">
+        <button type="button" onclick="setTheme('dark','Dark')">🌑 Dark</button>
+        <button type="button" onclick="setTheme('light','Light')">☀️ Light</button>
+        <button type="button" onclick="setTheme('purple','Purple')">💜 Purple</button>
+        <button type="button" onclick="setTheme('amber','Amber')">🟡 Amber</button>
+      </div>
+    </div>
+
+  </div><!-- /topbar-controls -->
+
+  <!-- Playback -->
+  <div class="topbar-right">
+    <div class="playback-group">
+      <div class="tip" data-tip="Start scenario">
+        <button class="btn btn-icon" type="button" onclick="startScenario()">▶</button>
+      </div>
+      <div class="tip" data-tip="Pause">
+        <button class="btn btn-icon" type="button" onclick="pauseScenario()">⏸</button>
+      </div>
+      <div class="tip" data-tip="Stop & rewind">
+        <button class="btn btn-icon" type="button" onclick="stopScenario()">■</button>
+      </div>
+    </div>
+    <!-- Hamburger for mobile -->
+    <button class="menu-toggle" onclick="openDrawer()" aria-label="Menu">☰</button>
+  </div>
+
+  <input id="scenarioFileInput" type="file" accept=".json,.jsonl,.txt" class="hidden" />
+</header>
+
+
+<!-- ================================= MAIN ================================== -->
+<main class="layout">
+
+  <!-- MAP PANEL -->
+  <section class="panel panel-map">
+    <div class="panel-header">
+      <span class="panel-title">Map View</span>
+      <div class="flex gap-4">
+        <div class="tip" data-tip="Reset map view">
+          <button class="btn btn-sm" type="button" onclick="resetMapViewFit()">⟲ Reset</button>
+        </div>
+      </div>
+    </div>
+    <div class="panel-body">
+      <div class="map-stage" id="mapStage">
+        <img id="farmMapImg" class="farm-map-img hidden" alt="Farm map" draggable="false" />
+        <canvas id="mapOverlay"></canvas>
+        <div id="droneDot" class="drone-dot hidden"></div>
+        <div id="mapEmptyHint" class="map-empty-hint">
+          <span class="hint-icon">🗺</span>
+          No farm image loaded yet.<br>
+          <span style="font-size:10px;margin-top:4px;">Select a farm from the Farm menu above.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RIGHT COLUMN -->
+  <aside class="right-col">
+
+    <!-- Camera -->
+    <div class="panel">
+      <div class="panel-header"><span class="panel-title">Camera View</span></div>
+      <div class="panel-body">
+        <div class="camera-placeholder">
+          <span class="cam-icon">📷</span>
+          Camera disabled
+        </div>
+      </div>
+    </div>
+
+    <!-- Vitals -->
+    <div class="panel">
+      <div class="panel-header"><span class="panel-title">Vitals</span></div>
+      <div class="panel-body">
+        <div class="vitals-grid">
+          <div class="stat-card">
+            <span class="stat-label">Signal / Ping</span>
+            <span class="stat-value na" id="statSignal">N/A</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Tank Level</span>
+            <span class="stat-value na" id="statTank">N/A</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Pollen Viability</span>
+            <span class="stat-value na" id="statPollen">N/A</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Battery</span>
+            <span class="stat-value na" id="statBattery">N/A</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- TERMINAL -->
+  <section class="panel panel-terminal">
+    <div class="panel-header">
+      <span class="panel-title">Terminal</span>
+      <button class="btn btn-sm" type="button" onclick="clearTerminal()">Clear</button>
+    </div>
+    <div class="panel-body">
+      <div id="terminalLog" class="terminal-log"></div>
+      <div class="terminal-input-row">
+        <input id="terminalInput" placeholder="Type command…  (/help for list)" />
+        <button class="btn btn-accent" type="button" onclick="sendCommand()">Send</button>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- Status bar -->
+<footer class="status-bar">
+  <div class="status-dot" id="statusDot"></div>
+  <span id="statusText">Ready</span>
+  <span style="margin-left:auto;opacity:.5;">SDP v1.0</span>
+</footer>
+
+
+<!-- ============ MOBILE DRAWER ============ -->
+<div class="mobile-drawer" id="mobileDrawer">
+  <div class="mobile-drawer-backdrop" onclick="closeDrawer()"></div>
+  <div class="mobile-drawer-panel">
+    <button class="drawer-close" onclick="closeDrawer()">✕</button>
+
+    <div class="drawer-section">Farm</div>
+    <button class="drawer-item" onclick="openFarmModal(); closeDrawer()">🌴 Select / Add Farm</button>
+
+    <div class="drawer-section">Mission</div>
+    <button class="drawer-item" onclick="startNewMissionFlow(); closeDrawer()">📍 New Mission</button>
+    <button class="drawer-item" onclick="openMissionModal('load'); closeDrawer()">📂 Load Mission</button>
+
+    <div class="drawer-section">Source</div>
+    <button class="drawer-item" onclick="openScenarioFile(); closeDrawer()">🗂 Load Scenario</button>
+    <button class="drawer-item" onclick="openConnectModal(); closeDrawer()">🔌 Connect Client</button>
+
+    <div class="drawer-section">Theme</div>
+    <button class="drawer-item" onclick="setTheme('dark','Dark'); closeDrawer()">🌑 Dark</button>
+    <button class="drawer-item" onclick="setTheme('light','Light'); closeDrawer()">☀️ Light</button>
+    <button class="drawer-item" onclick="setTheme('purple','Purple'); closeDrawer()">💜 Purple</button>
+    <button class="drawer-item" onclick="setTheme('amber','Amber'); closeDrawer()">🟡 Amber</button>
+  </div>
+</div>
+
+
+<!-- ============ ADD FARM MODAL ============ -->
+<div id="farmModal" class="modal hidden" aria-hidden="true">
+  <div class="modal-backdrop" onclick="closeFarmModal()"></div>
+  <div class="modal-card modal-card--xl">
+    <div class="modal-header">
+      <div class="modal-title">Add / Edit Farm</div>
+      <button class="btn" onclick="closeFarmModal()">✕ Close</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-field">
+        <label class="label">Farm name</label>
+        <input id="farmNameInput" class="input" placeholder="e.g., ARS_farm_01" />
+      </div>
+      <div class="form-field">
+        <label class="label">Farm image</label>
+        <input id="farmImageInput" type="file" accept="image/*" class="input" style="padding:6px;" />
+      </div>
+
+      <div class="calib-grid">
+        <div class="calib-left">
+          <div id="calibCanvasWrap" class="calib-canvas-wrap">
+            <canvas id="calibCanvas"></canvas>
+            <div id="calibOverlayHint" class="overlay-hint">Upload an image to start calibration</div>
+          </div>
+          <div class="calib-actions" style="margin-top:8px;">
+            <div class="tip" data-tip="Remove last calibration point">
+              <button class="btn btn-sm" type="button" onclick="undoCalibPoint()">↩ Undo</button>
+            </div>
+            <div class="tip" data-tip="Clear all calibration points">
+              <button class="btn btn-sm" type="button" onclick="clearCalib()">✕ Clear</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="calib-right">
+          <div class="label">Calibration Points</div>
+          <div id="pointsList" class="points-list"></div>
+          <div class="error" id="farmError"></div>
+          <button class="btn btn-accent btn-lg" style="margin-top:auto;" type="button" onclick="saveFarm()">💾 Save Farm</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============ MAP CREATION MODAL ============ -->
+<div id="mapCreationModal" class="modal hidden" aria-hidden="true">
+  <div class="modal-backdrop" onclick="closeMapCreationModal()"></div>
+  <div class="modal-card modal-card--xl">
+    <div class="modal-header">
+      <div class="modal-title">Map Creation — Tree Detection &amp; Selection</div>
+      <button class="btn" onclick="closeMapCreationModal()">✕ Close</button>
+    </div>
+    <div class="modal-body">
+      <div class="mc-layout">
+
+        <!-- Left: canvas -->
+        <div style="flex:1;display:flex;flex-direction:column;gap:6px;min-width:0;">
+          <div class="mc-toolbar">
+            <div class="tip" data-tip="Run YOLO detection">
+              <button class="btn btn-sm" onclick="runYoloDetection()">⚡ Detect</button>
+            </div>
+            <div class="tip" data-tip="Click to place tree manually">
+              <button class="btn btn-sm" onclick="setMapMode('manual')" id="btnModeManual">＋ Manual</button>
+            </div>
+            <div class="tip" data-tip="Click ring to toggle selection">
+              <button class="btn btn-sm" onclick="setMapMode('select')" id="btnModeSelect">◎ Select</button>
+            </div>
+            <div class="tip" data-tip="Click ring to delete">
+              <button class="btn btn-sm" onclick="setMapMode('delete')" id="btnModeDelete">✕ Delete</button>
+            </div>
+            <button class="btn btn-sm" onclick="selectAllTrees()">⊕ All</button>
+            <button class="btn btn-sm" onclick="clearTreeSelection()">⊘ Clear</button>
+            <span id="mapModeLabel" class="mc-mode-label">mode: select</span>
+          </div>
+
+          <div id="mcCanvasWrap" class="mc-canvas-wrap">
+            <canvas id="mcCanvas"></canvas>
+            <div id="mcHint" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:.4;font-size:13px;font-family:var(--font-mono);">
+              Select a farm first!
+            </div>
+          </div>
+          <div id="mcStatus" class="mc-status"></div>
+        </div>
+
+        <!-- Right: sidebar -->
+        <div class="mc-sidebar">
+          <div>
+            <div class="label" style="margin-bottom:6px;">Detected / Added Trees</div>
+            <div id="mcTreeList" class="mc-tree-list"></div>
+          </div>
+          <div>
+            <div class="label" style="margin-bottom:6px;">Selected for Mission</div>
+            <div id="mcSelectedList" class="mc-tree-list"></div>
+          </div>
+          <div style="margin-top:auto;">
+            <div class="tip" data-tip="Use selected trees for mission planning" style="display:block;width:100%;">
+              <button class="btn btn-accent btn-full" onclick="confirmTreeSelection()">✓ Use Selection</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============ MISSION MODAL ============ -->
+<div id="missionModal" class="modal hidden" aria-hidden="true">
+  <div class="modal-backdrop" onclick="closeMissionModal()"></div>
+  <div class="modal-card modal-card--md">
+    <div class="modal-header">
+      <div class="flex gap-8" style="align-items:center;">
+        <div class="modal-title">Mission</div>
+        <span id="missionStatusBadge" class="mission-badge mission-badge--idle">No mission</span>
+      </div>
+      <button class="btn" onclick="closeMissionModal()">✕ Close</button>
+    </div>
+
+    <div class="mission-tabs">
+      <button class="mission-tab-btn active" data-tab="plan" onclick="switchMissionTab('plan',this)">Plan</button>
+      <button class="mission-tab-btn" data-tab="load" onclick="switchMissionTab('load',this)">Load</button>
+      <button class="mission-tab-btn" data-tab="active" onclick="switchMissionTab('active',this)">Active</button>
+    </div>
+
+    <!-- TAB: Plan -->
+    <div id="tab-plan" class="mission-tab-body">
+      <div class="mission-section">
+        <div class="form-field">
+          <label class="label">Mission Name</label>
+          <input id="missionNameInput" class="input" placeholder="e.g. block-A-row-3" />
+        </div>
+      </div>
+
+      <div class="mission-section">
+        <div class="flex" style="justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <label class="label" style="margin:0;">Trees to Visit</label>
+          <button class="btn btn-sm" onclick="closeMissionModal(); openMapCreationModal();">Open Map Tool →</button>
+        </div>
+        <div id="selectedTreesList" class="tree-list-empty">
+          No trees selected. Use the map tool to detect &amp; select trees.
+        </div>
+      </div>
+
+      <div class="mission-section">
+        <button class="btn btn-full" onclick="computeMissionPath()">⟳ Compute Path (Dijkstra)</button>
+      </div>
+
+      <div id="missionPathPreview" class="mission-path-preview hidden">
+        <div class="label" style="margin-bottom:6px;">Computed Order</div>
+        <div id="missionPathOrder"></div>
+        <div class="flex gap-6" style="margin-top:10px;">
+          <button class="btn btn-sm flex-1" onclick="requestMissionSave()">💾 Save</button>
+          <button class="btn btn-sm btn-accent flex-1" onclick="requestMissionActivate()">Activate →</button>
+        </div>
+      </div>
+
+      <div id="missionPlanError" class="error" style="margin-top:8px;"></div>
+    </div>
+
+    <!-- TAB: Load -->
+    <div id="tab-load" class="mission-tab-body hidden">
+      <div class="mission-section">
+        <button class="btn btn-sm btn-full" onclick="refreshMissionList()">↺ Refresh</button>
+      </div>
+      <div id="missionList" class="mission-list">
+        <div class="tree-list-empty">Loading…</div>
+      </div>
+    </div>
+
+    <!-- TAB: Active -->
+    <div id="tab-active" class="mission-tab-body hidden">
+      <div id="activeMissionEmpty" class="tree-list-empty">No mission activated yet.</div>
+      <div id="activeMissionDetail" class="hidden">
+        <div class="mission-section">
+          <div class="label" style="margin-bottom:4px;">Current Mission</div>
+          <div id="activeMissionName" style="font-weight:700;font-size:14px;"></div>
+        </div>
+        <div class="mission-section">
+          <div class="label" style="margin-bottom:6px;">Waypoint Progress</div>
+          <div id="waypointProgress"></div>
+        </div>
+        <div class="flex gap-6">
+          <button class="btn btn-accent flex-1" onclick="uploadMissionToDrone()">📡 Upload to Drone</button>
+          <button class="btn btn-danger flex-1" onclick="abortMission()">⛔ Abort</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ============ MISSION NAME MODAL ============ -->
+<div id="missionNameModal" class="modal hidden" aria-hidden="true">
+  <div class="modal-backdrop" onclick="closeMissionNameModal()"></div>
+  <div class="modal-card modal-card--sm">
+    <div class="modal-header">
+      <div class="modal-title" id="missionNameModalTitle">Mission Name</div>
+      <button class="btn" onclick="closeMissionNameModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-field">
+        <label class="label">Mission Name</label>
+        <input id="missionNameModalInput" class="input" placeholder="e.g. block-A-row-3" />
+      </div>
+      <div id="missionNameModalError" class="error"></div>
+      <div class="flex gap-6" style="justify-content:flex-end;margin-top:14px;">
+        <button class="btn" onclick="closeMissionNameModal()">Cancel</button>
+        <button class="btn btn-accent" id="missionNameConfirmBtn" type="button">Confirm</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============ CONNECT MODAL ============ -->
+<div id="connectModal" class="modal hidden" aria-hidden="true">
+  <div class="modal-backdrop" onclick="closeConnectModal()"></div>
+  <div class="modal-card modal-card--sm">
+    <div class="modal-header">
+      <div class="modal-title">Connect to Drone</div>
+      <button class="btn" onclick="closeConnectModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-field">
+        <label class="label">Host / IP</label>
+        <input id="connectHost" class="input" placeholder="192.168.1.x or hostname" />
+      </div>
+      <div class="form-field">
+        <label class="label">Port</label>
+        <input id="connectPort" class="input" value="14550" />
+      </div>
+      <div class="flex gap-6" style="justify-content:flex-end;margin-top:14px;">
+        <button class="btn" onclick="closeConnectModal()">Cancel</button>
+        <button class="btn btn-accent" onclick="connectToDrone()">🔌 Connect</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ========================
+     JAVASCRIPT
+======================== -->
+<script>
+'use strict';
+
+/* ============ Config ============ */
+const API = "http://localhost:5000";
+
+/* ============ State ============ */
+let scenario              = { name: null, events: [], idx: 0, playing: false, raf: null, startPerf: 0 };
+let scenarioLoaded        = false;
+let pendingMissionAction  = null;
+let pendingMissionActionPlan = null;
+let justCreatedFarmName   = null;
+const FARM_KEY            = "sdp.farms.v1";
+let mcTrees               = [];
+let mcSelected            = new Set();
+let mcMode                = "select";
+let mcImg                 = null;
+let mcScale               = 1;
+let missionPlan           = null;
+let activeMission         = null;
+
+
+/* ============
+   THEME
+============ */
+function setTheme(id, label) {
+  document.documentElement.dataset.theme = id;
+  document.getElementById("themeLabel").textContent = label;
+  localStorage.setItem("sdp-theme", id);
+  localStorage.setItem("sdp-theme-label", label);
+}
+(function restoreTheme() {
+  const id    = localStorage.getItem("sdp-theme");
+  const label = localStorage.getItem("sdp-theme-label");
+  if (id) document.documentElement.dataset.theme = id;
+  if (label) document.getElementById("themeLabel").textContent = label;
+})();
+
+
+/* ============
+   MOBILE DRAWER
+============ */
+function openDrawer()  { document.getElementById("mobileDrawer").classList.add("open"); }
+function closeDrawer() { document.getElementById("mobileDrawer").classList.remove("open"); }
+
+
+/* ============
+   DROPDOWNS
+============ */
+document.querySelectorAll(".dropdown-toggle").forEach(btn => {
+  btn.onclick = e => {
+    e.stopPropagation();
+    closeDropdowns();
+    btn.parentElement.classList.toggle("open");
+  };
+});
+document.addEventListener("click", closeDropdowns);
+function closeDropdowns() {
+  document.querySelectorAll(".dropdown.open").forEach(d => d.classList.remove("open"));
+}
+
+
+/* ============
+   STATUS BAR
+============ */
+function setStatus(msg, ok) {
+  document.getElementById("statusText").textContent = msg;
+  document.getElementById("statusDot").className = "status-dot" + (ok ? " ok" : "");
+}
+
+
+/* ============
+   TERMINAL
+============ */
+function log(msg) {
+  const el = document.getElementById("terminalLog");
+  if (!el) return;
+  let cls = "";
+  if (msg.startsWith("[OK]"))   cls = "log-ok";
+  if (msg.startsWith("[ERR]"))  cls = "log-err";
+  if (msg.startsWith("[WARN]")) cls = "log-warn";
+  if (msg.startsWith("[INFO]") || msg.startsWith("[GPS]") || msg.startsWith("[STATE]")) cls = "log-info";
+  const line = document.createElement("div");
+  if (cls) line.className = cls;
+  line.textContent = msg;
+  el.appendChild(line);
+  el.scrollTop = el.scrollHeight;
+}
+
+function clearTerminal() {
+  document.getElementById("terminalLog").innerHTML = "";
+}
+
+function sendCommand() {
+  const input = document.getElementById("terminalInput");
+  const cmd   = input.value.trim();
+  if (!cmd) return;
+  log(`> ${cmd}`);
+  handleCommand(cmd);
+  input.value = "";
+}
+
+function handleCommand(cmd) {
+  switch (cmd.toLowerCase()) {
+    case "/fit":
+    case "/reset":  resetMapViewFit(); log("[OK] Map view reset"); break;
+    case "/help":   log("[INFO] Commands: /reset  /fit  /clear  /help"); break;
+    case "/clear":  clearTerminal(); break;
+    default: log(`[ERR] Unknown command: ${cmd}  (try /help)`);
+  }
+}
+
+document.getElementById("terminalInput").addEventListener("keydown", e => {
+  if (e.key === "Enter") sendCommand();
+});
+
+
+/* ============ FARM STORAGE ============ */
+function loadFarms()  {
+  try { return JSON.parse(localStorage.getItem(FARM_KEY) || "[]"); }
+  catch { return []; }
+}
+function saveFarms(farms) { localStorage.setItem(FARM_KEY, JSON.stringify(farms)); }
+function upsertFarm(farmObj) {
+  const farms = loadFarms();
+  const i = farms.findIndex(f => f.name === farmObj.name);
+  if (i >= 0) farms[i] = farmObj; else farms.push(farmObj);
+  saveFarms(farms);
+}
+
+function setFarmLabel(name) {
+  const el = document.getElementById("farmLabel");
+  if (el) el.textContent = name;
+}
+function getActiveFarmName() {
+  return document.getElementById("farmLabel")?.textContent?.trim() || "";
+}
+function getActiveFarmObj() {
+  const name = getActiveFarmName();
+  return loadFarms().find(f => f.name === name) || null;
+}
+
+function renderFarmMenu() {
+  const menu = document.getElementById("farmMenu");
+  if (!menu) return;
+  menu.innerHTML = "";
+  const farms = [{ name: "ARS_farm_uncallibrated" }, ...loadFarms()];
+
+  farms.forEach(f => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.textContent = f.name;
+    btn.onclick = () => {
+      setFarmLabel(f.name);
+      const saved = loadFarms().find(x => x.name === f.name);
+      if (saved) loadFarmIntoUI(f.name);
+      log(`[INFO] Farm selected: ${f.name}`);
+      closeDropdowns();
+    };
+    menu.appendChild(btn);
+  });
+
+  const sep = document.createElement("div");
+  sep.className = "menu-group";
+  sep.textContent = "Actions";
+  menu.appendChild(sep);
+
+  const createBtn = document.createElement("button");
+  createBtn.type = "button";
+  createBtn.textContent = "＋ Add new farm…";
+  createBtn.onclick = () => { closeDropdowns(); openFarmModal(); };
+  menu.appendChild(createBtn);
+}
+renderFarmMenu();
+
+
+/* ============ FARM MODAL AND  CALIBRATION ============ */
+const calibCanvas    = document.getElementById("calibCanvas");
+const calibWrap      = document.getElementById("calibCanvasWrap");
+const overlayHint    = document.getElementById("calibOverlayHint");
+const farmImageInput = document.getElementById("farmImageInput");
+const ctx            = calibCanvas.getContext("2d");
+const pointsListEl   = document.getElementById("pointsList");
+
+let calibImg        = null;
+let calibImgDataURL = null;
+let calibPoints     = [];
+let hoverIdx = -1, dragIdx = -1, dragOffset = { dx: 0, dy: 0 };
+
+function openFarmModal() {
+  document.getElementById("farmModal").classList.remove("hidden");
+  document.getElementById("farmModal").setAttribute("aria-hidden", "false");
+  refreshCanvasAfterModalOpen();
+}
+function closeFarmModal() {
+  document.getElementById("farmModal").classList.add("hidden");
+  document.getElementById("farmModal").setAttribute("aria-hidden", "true");
+}
+
+function setCanvasSize(w, h) {
+  calibCanvas.width  = w; calibCanvas.height = h;
+  calibCanvas.style.width  = w + "px"; calibCanvas.style.height = h + "px";
+}
+function fitCanvasToWrap(img) {
+  const wrapW = calibWrap?.clientWidth || 600;
+  const scale = Math.min(1, wrapW / img.naturalWidth);
+  setCanvasSize(Math.max(10, Math.round(img.naturalWidth * scale)),
+                Math.max(10, Math.round(img.naturalHeight * scale)));
+}
+function drawCalibration() {
+  ctx.clearRect(0, 0, calibCanvas.width, calibCanvas.height);
+  ctx.fillStyle = "rgba(0,0,0,.12)";
+  ctx.fillRect(0, 0, calibCanvas.width, calibCanvas.height);
+  if (calibImg) ctx.drawImage(calibImg, 0, 0, calibCanvas.width, calibCanvas.height);
+}
+function drawPoints() {
+  if (!calibImg) return;
+  calibPoints.forEach((p, i) => {
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, 6, 0, Math.PI * 2);
+    ctx.fillStyle = i === hoverIdx ? "#ffaa3d" : "#3d9aff";
+    ctx.fill();
+    ctx.font = "12px monospace";
+    ctx.fillStyle = "#fff";
+    ctx.fillText(`#${i + 1}`, p.x + 10, p.y - 8);
+  });
+  if (hoverIdx >= 0) {
+    const p = calibPoints[hoverIdx];
+    const text = `#${hoverIdx+1}  x:${p.x}  y:${p.y}`;
+    ctx.font = "12px monospace";
+    const pad = 6, w = ctx.measureText(text).width + pad*2, h = 22;
+    const tx = Math.min(p.x+14, calibCanvas.width-w-6), ty = Math.max(p.y-30, 6);
+    ctx.fillStyle = "rgba(0,0,0,.8)"; ctx.fillRect(tx,ty,w,h);
+    ctx.fillStyle = "#fff"; ctx.fillText(text, tx+pad, ty+15);
+  }
+}
+function redrawAll() { drawCalibration(); drawPoints(); }
+function refreshCanvasAfterModalOpen() {
+  if (!calibImg) { setCanvasSize(600, 360); drawCalibration(); return; }
+  setTimeout(() => { fitCanvasToWrap(calibImg); drawCalibration(); }, 50);
+}
+
+farmImageInput.addEventListener("change", e => {
+  const file = e.target.files?.[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    calibImgDataURL = reader.result;
+    const img = new Image();
+    img.onload = () => {
+      calibImg = img;
+      if (overlayHint) overlayHint.style.display = "none";
+      fitCanvasToWrap(img); drawCalibration();
+      log("[OK] Calibration image loaded.");
+    };
+    img.src = calibImgDataURL;
+  };
+  reader.readAsDataURL(file);
+});
+
+function hitTestPoint(x, y) {
+  const r = 8;
+  for (let i = calibPoints.length - 1; i >= 0; i--) {
+    const p = calibPoints[i];
+    if ((x-p.x)**2 + (y-p.y)**2 <= r*r) return i;
+  }
+  return -1;
+}
+function canvasToLocal(e) {
+  const rect = calibCanvas.getBoundingClientRect();
+  return { x: Math.round(e.clientX - rect.left), y: Math.round(e.clientY - rect.top) };
+}
+
+calibCanvas.addEventListener("mousemove", e => {
+  if (!calibImg) return;
+  const { x, y } = canvasToLocal(e);
+  if (dragIdx >= 0) {
+    calibPoints[dragIdx].x = Math.max(0, Math.min(calibCanvas.width, x - dragOffset.dx));
+    calibPoints[dragIdx].y = Math.max(0, Math.min(calibCanvas.height, y - dragOffset.dy));
+    renderPointsList(); redrawAll(); return;
+  }
+  const idx = hitTestPoint(x, y);
+  if (idx !== hoverIdx) { hoverIdx = idx; redrawAll(); }
+});
+calibCanvas.addEventListener("mousedown", e => {
+  if (!calibImg) return;
+  const { x, y } = canvasToLocal(e);
+  const idx = hitTestPoint(x, y);
+  if (idx >= 0) { dragIdx = idx; dragOffset.dx = x - calibPoints[idx].x; dragOffset.dy = y - calibPoints[idx].y; }
+});
+window.addEventListener("mouseup", () => {
+  if (dragIdx >= 0) { dragIdx = -1; renderPointsList(); redrawAll(); }
+});
+calibCanvas.addEventListener("click", e => {
+  if (!calibImg || dragIdx >= 0) return;
+  const { x, y } = canvasToLocal(e);
+  if (hitTestPoint(x, y) >= 0) return;
+  calibPoints.push({ x, y, lat: "", lon: "" });
+  hoverIdx = calibPoints.length - 1;
+  renderPointsList(); redrawAll();
+});
+
+function renderPointsList() {
+  pointsListEl.innerHTML = "";
+  if (!calibPoints.length) {
+    pointsListEl.innerHTML = `<div class="hint">Click on the image to add calibration points.</div>`;
+    return;
+  }
+  calibPoints.forEach((p, idx) => {
+    const row = document.createElement("div");
+    row.className = "point-row";
+    row.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+        <b>Point #${idx + 1}</b>
+        <span class="hint">(px: ${p.x}, ${p.y})</span>
+      </div>
+      <div class="point-grid">
+        <label class="hint">x</label>
+        <input class="input" style="font-size:11px;" data-i="${idx}" data-k="x" value="${p.x}">
+        <label class="hint">y</label>
+        <input class="input" style="font-size:11px;" data-i="${idx}" data-k="y" value="${p.y}">
+        <label class="hint">lat</label>
+        <input class="input" style="font-size:11px;" data-i="${idx}" data-k="lat" value="${p.lat ?? ""}" placeholder="25.123…">
+        <label class="hint">lon</label>
+        <input class="input" style="font-size:11px;" data-i="${idx}" data-k="lon" value="${p.lon ?? ""}" placeholder="51.234…">
+      </div>
+    `;
+    row.querySelectorAll("input").forEach(inp => {
+      inp.addEventListener("input", () => {
+        const i = Number(inp.dataset.i), k = inp.dataset.k;
+        const v = inp.value.trim();
+        if (k === "x" || k === "y") {
+          const n = Math.round(Number(v));
+          if (!Number.isFinite(n)) return;
+          calibPoints[i][k] = n; redrawAll();
+        } else {
+          calibPoints[i][k] = v;
+        }
+      });
+    });
+    pointsListEl.appendChild(row);
+  });
+}
+
+function undoCalibPoint() { calibPoints.pop(); hoverIdx = -1; renderPointsList(); redrawAll(); }
+function clearCalib()     { calibPoints = []; hoverIdx = -1; renderPointsList(); redrawAll(); }
+renderPointsList();
+
+function showFarmError(msg) {
+  const el = document.getElementById("farmError");
+  if (el) el.textContent = msg || "";
+}
+
+function saveFarm() {
+  showFarmError("");
+  const name = (document.getElementById("farmNameInput")?.value || "").trim();
+  if (!name) return showFarmError("Farm name is required.");
+  if (!calibImgDataURL) return showFarmError("Please upload a farm image.");
+  if (calibPoints.length < 2) return showFarmError("Add at least 2 calibration points.");
+  for (let i = 0; i < calibPoints.length; i++) {
+    const lat = Number(String(calibPoints[i].lat).trim());
+    const lon = Number(String(calibPoints[i].lon).trim());
+    if (!Number.isFinite(lat) || !Number.isFinite(lon))
+      return showFarmError(`Enter valid lat/lon for Point #${i + 1}.`);
+  }
+  const existing = loadFarms().some(f => f.name === name);
+  const farmObj = {
+    name,
+    imageDataURL: calibImgDataURL,
+    points: calibPoints.map(p => ({ x: Number(p.x), y: Number(p.y), lat: Number(p.lat), lon: Number(p.lon) })),
+    createdAt: new Date().toISOString(),
+  };
+  upsertFarm(farmObj);
+  renderFarmMenu();
+  setFarmLabel(name);
+  showFarmOnMainMap(farmObj.imageDataURL);
+  log(`[OK] Farm saved: ${name} (${farmObj.points.length} pts)`);
+  closeFarmModal();
+  if (!existing) {
+    justCreatedFarmName = name;
+    setTimeout(() => { loadFarmIntoUI(name); openMapCreationModal(); }, 120);
+  }
+}
+
+function loadFarmIntoUI(name) {
+  const farm = loadFarms().find(f => f.name === name);
+  if (!farm) return;
+  calibImgDataURL = farm.imageDataURL;
+  const img = new Image();
+  img.onload = () => {
+    calibImg = img;
+    if (overlayHint) overlayHint.style.display = "none";
+    calibPoints = (farm.points || []).map(p => ({ x: Number(p.x), y: Number(p.y), lat: Number(p.lat), lon: Number(p.lon) }));
+    fitCanvasToWrap(img); renderPointsList(); redrawAll();
+    showFarmOnMainMap(farm.imageDataURL);
+    log(`[OK] Farm loaded: ${farm.name}`);
+  };
+  img.src = calibImgDataURL;
+}
+
+
+/* ============ MAIN MAP – PAN / ZOOM / DRONE ============ */
+const mapStage  = document.getElementById("mapStage");
+const mapImgEl  = document.getElementById("farmMapImg");
+const mapCanvas = document.getElementById("mapOverlay");
+const mapCtx    = mapCanvas.getContext("2d");
+let drone     = { x: null, y: null, tx: null, ty: null };
+let animReq   = null;
+let mapState  = { scale: 1, tx: 0, ty: 0 };
+let mapDrag   = { active: false, startX: 0, startY: 0, startTx: 0, startTy: 0 };
+
+function showFarmOnMainMap(dataURL) {
+  const img  = mapImgEl;
+  const hint = document.getElementById("mapEmptyHint");
+  if (!dataURL) { img.classList.add("hidden"); hint.classList.remove("hidden"); return; }
+  img.onload = () => onMapImageReady();
+  img.src    = dataURL;
+  img.classList.remove("hidden");
+  hint.classList.add("hidden");
+}
+function onMapImageReady() { resizeMapOverlay(); ensureDroneAnim(); }
+function resizeMapOverlay() {
+  if (!mapStage || !mapCanvas) return;
+  const r = mapStage.getBoundingClientRect();
+  mapCanvas.width  = Math.max(1, Math.round(r.width));
+  mapCanvas.height = Math.max(1, Math.round(r.height));
+  drawMapOverlay();
+}
+window.addEventListener("resize", resizeMapOverlay);
+
+function applyMapTransform() {
+  if (!mapImgEl) return;
+  mapImgEl.style.transform = `translate(${mapState.tx}px, ${mapState.ty}px) scale(${mapState.scale})`;
+}
+function resetMapViewFit() { mapState = { scale: 1, tx: 0, ty: 0 }; applyMapTransform(); }
+
+if (mapStage) {
+  mapStage.addEventListener("mousedown", e => {
+    if (!mapImgEl || mapImgEl.classList.contains("hidden")) return;
+    mapDrag.active = true;
+    mapDrag.startX = e.clientX; mapDrag.startY = e.clientY;
+    mapDrag.startTx = mapState.tx; mapDrag.startTy = mapState.ty;
+  });
+  window.addEventListener("mousemove", e => {
+    if (!mapDrag.active) return;
+    mapState.tx = mapDrag.startTx + (e.clientX - mapDrag.startX);
+    mapState.ty = mapDrag.startTy + (e.clientY - mapDrag.startY);
+    applyMapTransform();
+  });
+  window.addEventListener("mouseup", () => { mapDrag.active = false; });
+  mapStage.addEventListener("wheel", e => {
+    if (!mapImgEl || mapImgEl.classList.contains("hidden")) return;
+    e.preventDefault();
+    const factor = e.deltaY < 0 ? 1.08 : 0.92;
+    mapState.scale = Math.min(6, Math.max(0.2, mapState.scale * factor));
+    applyMapTransform();
+  }, { passive: false });
+  // Touch support
+  let lastDist = 0;
+  mapStage.addEventListener("touchstart", e => {
+    if (e.touches.length === 1) {
+      const t = e.touches[0];
+      mapDrag.active = true; mapDrag.startX = t.clientX; mapDrag.startY = t.clientY;
+      mapDrag.startTx = mapState.tx; mapDrag.startTy = mapState.ty;
+    } else if (e.touches.length === 2) {
+      lastDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX,
+                            e.touches[0].clientY - e.touches[1].clientY);
+    }
+  }, { passive: true });
+  mapStage.addEventListener("touchmove", e => {
+    e.preventDefault();
+    if (e.touches.length === 1 && mapDrag.active) {
+      const t = e.touches[0];
+      mapState.tx = mapDrag.startTx + (t.clientX - mapDrag.startX);
+      mapState.ty = mapDrag.startTy + (t.clientY - mapDrag.startY);
+      applyMapTransform();
+    } else if (e.touches.length === 2) {
+      const d = Math.hypot(e.touches[0].clientX - e.touches[1].clientX,
+                           e.touches[0].clientY - e.touches[1].clientY);
+      if (lastDist > 0) {
+        mapState.scale = Math.min(6, Math.max(0.2, mapState.scale * (d / lastDist)));
+        applyMapTransform();
+      }
+      lastDist = d;
+    }
+  }, { passive: false });
+  mapStage.addEventListener("touchend", () => { mapDrag.active = false; lastDist = 0; });
+}
+
+function coverTransform(imgW, imgH, boxW, boxH) {
+  const s = Math.max(boxW / imgW, boxH / imgH);
+  return { s, ox: (boxW - imgW*s)/2, oy: (boxH - imgH*s)/2 };
+}
+function imgPxToStagePx(ix, iy) {
+  if (!mapImgEl?.naturalWidth || !mapCanvas?.width) return { x: 0, y: 0 };
+  const t = coverTransform(mapImgEl.naturalWidth, mapImgEl.naturalHeight, mapCanvas.width, mapCanvas.height);
+  return { x: t.ox + ix*t.s, y: t.oy + iy*t.s };
+}
+function gpsToImgPx(lat, lon, farmObj) {
+  const pts = farmObj?.points || [];
+  if (pts.length < 2) return null;
+  const A = pts[0], B = pts[pts.length - 1];
+  const dLat = B.lat - A.lat, dLon = B.lon - A.lon;
+  if (Math.abs(dLat) < 1e-12 || Math.abs(dLon) < 1e-12) return null;
+  return { x: A.x + ((lon - A.lon)/dLon)*(B.x - A.x), y: A.y + ((lat - A.lat)/dLat)*(B.y - A.y) };
+}
+function setDroneTargetFromGps(lat, lon) {
+  const farm = getActiveFarmObj();
+  if (!farm) return;
+  const imgPx = gpsToImgPx(lat, lon, farm);
+  if (!imgPx) return;
+  const st = imgPxToStagePx(imgPx.x, imgPx.y);
+  drone.tx = st.x; drone.ty = st.y;
+  if (drone.x == null) { drone.x = st.x; drone.y = st.y; }
+}
+function drawMapOverlay() {
+  if (!mapCtx) return;
+  mapCtx.clearRect(0, 0, mapCanvas.width, mapCanvas.height);
+  if (drone.x == null) return;
+  mapCtx.beginPath();
+  mapCtx.arc(drone.x, drone.y, 7, 0, Math.PI*2);
+  mapCtx.fillStyle = "rgba(61,255,154,.95)";
+  mapCtx.fill();
+  mapCtx.lineWidth = 2; mapCtx.strokeStyle = "rgba(0,0,0,.7)"; mapCtx.stroke();
+}
+function stepDrone() {
+  if (drone.tx != null) {
+    const k = 0.14;
+    drone.x += (drone.tx - drone.x) * k;
+    drone.y += (drone.ty - drone.y) * k;
+  }
+  drawMapOverlay();
+  animReq = requestAnimationFrame(stepDrone);
+}
+function ensureDroneAnim() {
+  if (animReq) return;
+  animReq = requestAnimationFrame(stepDrone);
+}
+
+
+/* ============ MAP CREATION MODAL ============ */
+const mcCanvas = document.getElementById("mcCanvas");
+const mcCtx    = mcCanvas.getContext("2d");
+const RING_INNER = 18, RING_OUTER = 32;
+
+function openMapCreationModal() {
+  const farm = getActiveFarmObj();
+  if (!farm) { log("[ERR] Select a farm first before opening map creation."); return; }
+  document.getElementById("mapCreationModal").classList.remove("hidden");
+  document.getElementById("mapCreationModal").setAttribute("aria-hidden", "false");
+  const img = new Image();
+  img.onload = () => {
+    mcImg = img;
+    document.getElementById("mcHint").style.display = "none";
+    fitMcCanvas(img); renderMcCanvas(); renderMcTreeLists();
+  };
+  img.src = farm.imageDataURL;
+}
+function closeMapCreationModal() {
+  document.getElementById("mapCreationModal").classList.add("hidden");
+  document.getElementById("mapCreationModal").setAttribute("aria-hidden", "true");
+}
+function fitMcCanvas(img) {
+  const wrap = document.getElementById("mcCanvasWrap");
+  const maxW = wrap.clientWidth || 600, maxH = wrap.clientHeight || 360;
+  const s = Math.min(maxW / img.naturalWidth, maxH / img.naturalHeight, 1);
+  mcScale = 1 / s;
+  mcCanvas.width  = Math.round(img.naturalWidth  * s);
+  mcCanvas.height = Math.round(img.naturalHeight * s);
+  mcCanvas.style.width  = mcCanvas.width  + "px";
+  mcCanvas.style.height = mcCanvas.height + "px";
+}
+function renderMcCanvas() {
+  mcCtx.clearRect(0, 0, mcCanvas.width, mcCanvas.height);
+  if (mcImg) mcCtx.drawImage(mcImg, 0, 0, mcCanvas.width, mcCanvas.height);
+  mcTrees.forEach((t, i) => {
+    const cx = Math.round(t.cx / mcScale), cy = Math.round(t.cy / mcScale);
+    const ri = Math.round((t.w ? t.w/2 : RING_INNER) / mcScale);
+    const ro = ri + Math.round(10 / mcScale);
+    const sel = mcSelected.has(i);
+    const color = sel ? "#3dff9a" : "#ff7832";
+    mcCtx.strokeStyle = color; mcCtx.lineWidth = sel ? 2.5 : 1.5;
+    mcCtx.beginPath(); mcCtx.arc(cx, cy, ri, 0, Math.PI*2); mcCtx.stroke();
+    mcCtx.beginPath(); mcCtx.arc(cx, cy, ro, 0, Math.PI*2); mcCtx.stroke();
+    mcCtx.fillStyle = "#fff";
+    mcCtx.font = `${Math.max(9, Math.round(11 / mcScale))}px monospace`;
+    mcCtx.fillText(i, cx - 4, cy + 4);
+    if (t.conf != null) {
+      mcCtx.fillStyle = "rgba(255,255,255,.6)";
+      mcCtx.font = `${Math.max(7, Math.round(9 / mcScale))}px monospace`;
+      mcCtx.fillText(t.conf.toFixed(2), cx + ro + 3, cy + 4);
+    }
+  });
+}
+function renderMcTreeLists() {
+  const allEl = document.getElementById("mcTreeList");
+  const selEl = document.getElementById("mcSelectedList");
+  allEl.innerHTML = ""; selEl.innerHTML = "";
+  if (!mcTrees.length) {
+    allEl.innerHTML = `<div class="mc-empty">No trees yet.</div>`;
+  }
+  mcTrees.forEach((t, i) => {
+    const isSel = mcSelected.has(i);
+    const row = document.createElement("div");
+    row.className = "mc-tree-row" + (isSel ? " selected" : "");
+    row.innerHTML = `<div class="mc-tree-dot"></div><span>T${i} (${t.cx}, ${t.cy})${t.conf!=null?" ✓":""}</span>`;
+    row.onclick = () => toggleTreeSelection(i);
+    allEl.appendChild(row);
+  });
+  if (!mcSelected.size) {
+    selEl.innerHTML = `<div class="mc-empty">None selected.</div>`; return;
+  }
+  [...mcSelected].forEach(i => {
+    const t = mcTrees[i];
+    const row = document.createElement("div");
+    row.className = "mc-tree-row selected";
+    row.innerHTML = `<div class="mc-tree-dot"></div><span>T${i} (${t.cx}, ${t.cy})</span>`;
+    selEl.appendChild(row);
+  });
+}
+function toggleTreeSelection(i) {
+  if (mcSelected.has(i)) mcSelected.delete(i); else mcSelected.add(i);
+  renderMcCanvas(); renderMcTreeLists();
+}
+function setMapMode(m) {
+  mcMode = m;
+  document.getElementById("mapModeLabel").textContent = "mode: " + m;
+  ["manual","select","delete"].forEach(id => {
+    document.getElementById("btnMode" + id.charAt(0).toUpperCase() + id.slice(1))
+      ?.classList.toggle("btn-accent", id === m);
+  });
+}
+mcCanvas.addEventListener("click", e => {
+  if (!mcImg) return;
+  const rect = mcCanvas.getBoundingClientRect();
+  const px = Math.round((e.clientX - rect.left) * mcScale);
+  const py = Math.round((e.clientY - rect.top)  * mcScale);
+  if (mcMode === "manual") {
+    mcTrees.push({ id: mcTrees.length, cx: px, cy: py, w: RING_INNER*2, h: RING_INNER*2, manual: true });
+    renderMcCanvas(); renderMcTreeLists(); return;
+  }
+  if (mcMode === "select" || mcMode === "delete") {
+    const hit = mcTrees.findIndex(t => {
+      const ro = (t.w ? t.w/2 : RING_INNER) + 12;
+      return Math.hypot(px - t.cx, py - t.cy) <= ro;
+    });
+    if (hit >= 0) {
+      if (mcMode === "delete") {
+        mcTrees.splice(hit, 1);
+        const newSel = new Set();
+        mcSelected.forEach(idx => { if (idx !== hit) newSel.add(idx > hit ? idx - 1 : idx); });
+        mcSelected.clear(); newSel.forEach(i => mcSelected.add(i));
+      } else {
+        toggleTreeSelection(hit); return;
+      }
+      renderMcCanvas(); renderMcTreeLists();
+    }
+  }
+});
+function selectAllTrees()    { mcTrees.forEach((_, i) => mcSelected.add(i)); renderMcCanvas(); renderMcTreeLists(); }
+function clearTreeSelection() { mcSelected.clear(); renderMcCanvas(); renderMcTreeLists(); }
+
+function confirmTreeSelection() {
+  if (!mcSelected.size) { log("[WARN] No trees selected."); return; }
+  const farm = getActiveFarmObj();
+  const selectedTrees = [...mcSelected].map(i => mcTrees[i]);
+  const listEl = document.getElementById("selectedTreesList");
+  listEl.innerHTML = "";
+  selectedTrees.forEach((t, idx) => {
+    const row = document.createElement("div");
+    row.className = "waypoint-row";
+    row.innerHTML = `<div class="wp-num">${idx+1}</div>
+      <span>T${t.id} — (${t.cx}, ${t.cy})${farm ? " → GPS via calib" : ""}</span>`;
+    listEl.appendChild(row);
+  });
+  window._selectedTreesForMission = selectedTrees;
+  document.getElementById("missionPathPreview").classList.add("hidden");
+  document.getElementById("missionPathOrder").innerHTML = "";
+  document.getElementById("missionPlanError").textContent = "";
+  missionPlan = null;
+  log(`[OK] ${selectedTrees.length} trees confirmed for mission planning.`);
+  closeMapCreationModal(); openMissionModal("plan");
+  setMissionBadge("idle", "Ready to plan");
+}
+
+async function runYoloDetection() {
+  const farm = getActiveFarmObj();
+  if (!farm?.imageDataURL) { log("[ERR] No farm image loaded."); return; }
+  document.getElementById("mcStatus").textContent = "Running YOLO detection…";
+  try {
+    const res  = await fetch(`${API}/detect`, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ image: farm.imageDataURL, conf: 0.25 }),
+    });
+    const data = await res.json();
+    if (!res.ok) { log(`[ERR] Detection failed: ${data.error}`); document.getElementById("mcStatus").textContent = "Detection failed."; return; }
+    mcTrees = data.trees.map(t => ({ ...t }));
+    mcSelected.clear(); renderMcCanvas(); renderMcTreeLists();
+    document.getElementById("mcStatus").textContent = `Detected ${mcTrees.length} tree(s). Click rings to select.`;
+    log(`[OK] YOLO detected ${mcTrees.length} tree(s).`);
+  } catch (err) {
+    log(`[ERR] Could not reach backend: ${err.message}`);
+    document.getElementById("mcStatus").textContent = "Backend unreachable (is app.py running?)";
+  }
+}
+
+
+/* ============ MISSION ============ */
+function openMissionModal(tab = "plan") {
+  const modal = document.getElementById("missionModal");
+  modal.classList.remove("hidden");
+  modal.setAttribute("aria-hidden", "false");
+  const btn = document.querySelector(`.mission-tab-btn[data-tab="${tab}"]`);
+  switchMissionTab(tab, btn);
+}
+function closeMissionModal() {
+  document.getElementById("missionModal").classList.add("hidden");
+  document.getElementById("missionModal").setAttribute("aria-hidden", "true");
+}
+function switchMissionTab(tab, btn) {
+  document.querySelectorAll(".mission-tab-body").forEach(t => t.classList.add("hidden"));
+  document.querySelectorAll(".mission-tab-btn").forEach(b => b.classList.remove("active"));
+  document.getElementById("tab-" + tab).classList.remove("hidden");
+  if (btn) btn.classList.add("active");
+  if (tab === "load") refreshMissionList();
+}
+function setMissionBadge(state, label) {
+  const el = document.getElementById("missionStatusBadge");
+  el.className = `mission-badge mission-badge--${state}`;
+  el.textContent = label;
+}
+function updateMissionTopLabel(name, statusText) {
+  const top    = document.getElementById("missionTopLabel");
+  const status = document.getElementById("missionTopStatus");
+  if (top) top.textContent = name || "None";
+  if (status) status.textContent = statusText || "No active mission";
+}
+
+async function computeMissionPath() {
+  const trees = window._selectedTreesForMission;
+  if (!trees || trees.length < 2) {
+    document.getElementById("missionPlanError").textContent = "Select at least 2 trees via the map tool first.";
+    return;
+  }
+  document.getElementById("missionPlanError").textContent = "";
+  log("[INFO] Computing Dijkstra path…");
+  try {
+    const res  = await fetch(`${API}/plan`, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ trees }),
+    });
+    const data = await res.json();
+    if (!res.ok) { log(`[ERR] Path planning failed: ${data.error}`); return; }
+    missionPlan = { name: "", trees, order: data.order, waypoints: data.waypoints };
+    renderMissionPathPreview(missionPlan);
+    setMissionBadge("planned", "Path ready");
+    log(`[OK] Path computed. Order: ${data.order.join(" → ")}`);
+  } catch (err) {
+    log(`[ERR] Backend unreachable: ${err.message}`);
+    document.getElementById("missionPlanError").textContent = "Backend unreachable (is app.py running?)";
+  }
+}
+
+function renderMissionPathPreview(plan) {
+  const el = document.getElementById("missionPathOrder");
+  el.innerHTML = "";
+  plan.waypoints.forEach((t, i) => {
+    const row = document.createElement("div");
+    row.className = "waypoint-row";
+    row.innerHTML = `<div class="wp-num">${i+1}</div><span>T${t.id} (${t.cx}, ${t.cy})</span>`;
+    el.appendChild(row);
+  });
+  document.getElementById("missionPathPreview").classList.remove("hidden");
+}
+
+function requestMissionSave()     { if (!missionPlan) return; openMissionNameModal("save", missionPlan); }
+function requestMissionActivate() { if (!missionPlan) return; openMissionNameModal("activate", missionPlan); }
+
+async function saveMissionPlan(skipPrompt = false) {
+  if (!missionPlan) return;
+  if (!skipPrompt) { openMissionNameModal("save", missionPlan); return; }
+  const farm    = getActiveFarmName();
+  const payload = { ...missionPlan, farm };
+  try {
+    const res  = await fetch(`${API}/missions`, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json();
+    if (!res.ok) { log(`[ERR] Save failed: ${data.error}`); return; }
+    missionPlan.id = data.id;
+    log(`[OK] Mission saved: ${missionPlan.name} (id: ${data.id})`);
+    await refreshMissionList(); await renderMissionMenu();
+    updateMissionTopLabel(missionPlan.name, "Planned");
+    setMissionBadge("planned", "Saved");
+    setStatus(`Mission saved: ${missionPlan.name}`, true);
+  } catch (err) {
+    log(`[ERR] Backend unreachable: ${err.message}`);
+  }
+}
+
+async function activateMissionWithOptionalSave(plan) {
+  let p = plan || missionPlan;
+  if (!p) return;
+  if (!p.id) { missionPlan = p; await saveMissionPlan(true); p = missionPlan; }
+  activeMission = { ...p, currentWp: 0 };
+  setMissionBadge("active", "Active");
+  renderActiveMission(); openMissionModal("active");
+  updateMissionTopLabel(p.name, "Active");
+  log(`[OK] Mission activated: ${p.name} (${p.waypoints.length} waypoints)`);
+  setStatus(`Mission active: ${p.name}`, true);
+}
+
+function activateMission(plan) {
+  const p = plan || missionPlan;
+  if (!p) return;
+  if (!p.name || !p.name.trim()) { openMissionNameModal("activate", p); return; }
+  activateMissionWithOptionalSave(p);
+}
+
+function renderActiveMission() {
+  const emptyEl  = document.getElementById("activeMissionEmpty");
+  const detailEl = document.getElementById("activeMissionDetail");
+  if (!activeMission) { emptyEl.classList.remove("hidden"); detailEl.classList.add("hidden"); return; }
+  emptyEl.classList.add("hidden"); detailEl.classList.remove("hidden");
+  document.getElementById("activeMissionName").textContent = activeMission.name;
+  const progEl = document.getElementById("waypointProgress");
+  progEl.innerHTML = "";
+  activeMission.waypoints.forEach((t, i) => {
+    const done = i < activeMission.currentWp;
+    const row  = document.createElement("div");
+    row.className = "waypoint-row";
+    row.innerHTML = `<div class="wp-num${done ? " done" : ""}">${done ? "✓" : i+1}</div>
+      <span style="${done?"opacity:.4":""}">T${t.id} — (${t.cx}, ${t.cy})</span>`;
+    progEl.appendChild(row);
+  });
+}
+
+function abortMission() {
+  activeMission = null;
+  setMissionBadge("abort", "Aborted");
+  renderActiveMission();
+  updateMissionTopLabel("None", null);
+  setStatus("Mission aborted", false);
+  log("[WARN] Mission aborted.");
+  setTimeout(() => setMissionBadge("idle", "No mission"), 3000);
+}
+
+function uploadMissionToDrone() {
+  if (!activeMission) return;
+  log(`[INFO] Uploading mission "${activeMission.name}" to drone (${activeMission.waypoints.length} waypoints)…`);
+  log("[WARN] uploadMissionToDrone: implement MAVLink/dronekit handshake here.");
+}
+
+async function refreshMissionList() {
+  const listEl = document.getElementById("missionList");
+  listEl.innerHTML = `<div class="tree-list-empty">Loading…</div>`;
+  try {
+    const res  = await fetch(`${API}/missions`);
+    const data = await res.json();
+    if (!data.missions.length) { listEl.innerHTML = `<div class="tree-list-empty">No saved missions.</div>`; return; }
+    listEl.innerHTML = "";
+    data.missions.forEach(m => {
+      const item = document.createElement("div");
+      item.className = "mission-list-item";
+      item.innerHTML = `
+        <div>
+          <div class="mi-name">${m.name}</div>
+          <div class="mi-meta">${m.farm || "no farm"} · ${m.waypointCount} waypoints</div>
+        </div>
+        <div class="mi-actions">
+          <button class="btn btn-sm btn-accent" onclick="loadAndActivateMission('${m.id}')">Load</button>
+          <button class="btn btn-sm btn-danger" onclick="deleteMission('${m.id}',this)">✕</button>
+        </div>`;
+      listEl.appendChild(item);
+    });
+  } catch {
+    listEl.innerHTML = `<div class="tree-list-empty">Backend unreachable.</div>`;
+  }
+}
+
+async function loadAndActivateMission(id) {
+  try {
+    const res = await fetch(`${API}/missions/${id}`);
+    const data = await res.json();
+    activateMission(data);
+  } catch (err) { log(`[ERR] Could not load mission: ${err.message}`); }
+}
+
+async function deleteMission(id, btnEl) {
+  if (!confirm("Delete this mission?")) return;
+  try {
+    await fetch(`${API}/missions/${id}`, { method: "DELETE" });
+    log(`[OK] Mission ${id} deleted.`);
+    btnEl.closest(".mission-list-item")?.remove();
+    await refreshMissionList(); await renderMissionMenu();
+  } catch (err) { log(`[ERR] Delete failed: ${err.message}`); }
+}
+
+async function renderMissionMenu() {
+  const wrap = document.getElementById("missionLoadMenuGroup");
+  if (!wrap) return;
+  wrap.innerHTML = `<button class="disabled" type="button">Loading…</button>`;
+  try {
+    const res = await fetch(`${API}/missions`);
+    const data = await res.json();
+    if (!res.ok || !Array.isArray(data.missions) || !data.missions.length) {
+      wrap.innerHTML = `<button class="disabled" type="button">No missions saved</button>`; return;
+    }
+    wrap.innerHTML = "";
+    data.missions.forEach(m => {
+      const btn = document.createElement("button");
+      btn.type = "button"; btn.textContent = m.name;
+      btn.onclick = async () => { closeDropdowns(); await loadAndActivateMission(m.id); };
+      wrap.appendChild(btn);
+    });
+  } catch {
+    wrap.innerHTML = `<button class="disabled" type="button">No missions saved</button>`;
+  }
+}
+
+function startNewMissionFlow() {
+  const farm = getActiveFarmObj();
+  if (!farm) { log("[ERR] Select a farm first before creating a mission."); return; }
+  missionPlan = null;
+  document.getElementById("missionPlanError").textContent = "";
+  document.getElementById("missionPathOrder").innerHTML = "";
+  document.getElementById("missionPathPreview").classList.add("hidden");
+  document.getElementById("selectedTreesList").innerHTML = `No trees selected. Use the map tool to detect &amp; select trees.`;
+  window._selectedTreesForMission = null;
+  setMissionBadge("idle", "Select trees");
+  openMapCreationModal();
+}
+
+
+/* ============ Mission name modal ============ */
+function openMissionNameModal(mode, plan) {
+  pendingMissionAction     = mode;
+  pendingMissionActionPlan = plan || missionPlan;
+  const title = document.getElementById("missionNameModalTitle");
+  const input = document.getElementById("missionNameModalInput");
+  const error = document.getElementById("missionNameModalError");
+  title.textContent  = mode === "activate" ? "Name and activate mission" : "Save mission";
+  input.value        = (pendingMissionActionPlan?.name) || "";
+  error.textContent  = "";
+  document.getElementById("missionNameModal").classList.remove("hidden");
+  document.getElementById("missionNameModal").setAttribute("aria-hidden", "false");
+  setTimeout(() => input.focus(), 20);
+}
+function closeMissionNameModal() {
+  document.getElementById("missionNameModal").classList.add("hidden");
+  document.getElementById("missionNameModal").setAttribute("aria-hidden", "true");
+  pendingMissionAction = null; pendingMissionActionPlan = null;
+}
+async function confirmMissionNameModal() {
+  const input = document.getElementById("missionNameModalInput");
+  const error = document.getElementById("missionNameModalError");
+  const name  = input.value.trim();
+  const plan  = pendingMissionActionPlan || missionPlan;
+  if (!plan)  { error.textContent = "No mission plan available."; return; }
+  if (!name)  { error.textContent = "Mission name is required."; input.focus(); return; }
+  plan.name  = name;
+  missionPlan = plan;
+  const mode = pendingMissionAction;
+  closeMissionNameModal();
+  if (mode === "save")     await saveMissionPlan(true);
+  else if (mode === "activate") await activateMissionWithOptionalSave(plan);
+}
+document.getElementById("missionNameConfirmBtn").addEventListener("click", confirmMissionNameModal);
+document.getElementById("missionNameModalInput").addEventListener("keydown", e => {
+  if (e.key === "Enter") confirmMissionNameModal();
+});
+
+
+/* ============ CONNECT MODAL ============ */
+function openConnectModal()  { document.getElementById("connectModal").classList.remove("hidden"); }
+function closeConnectModal() { document.getElementById("connectModal").classList.add("hidden"); }
+function connectToDrone() {
+  const host = document.getElementById("connectHost").value.trim();
+  const port = document.getElementById("connectPort").value.trim();
+  if (!host) return;
+  document.getElementById("sourceLabel").textContent = `Live: ${host}:${port}`;
+  document.getElementById("sourceStatusItem").textContent = "Connecting… (implement MAVLink here)";
+  log(`[INFO] Connecting to ${host}:${port}…`);
+  setStatus(`Connecting to ${host}:${port}`, false);
+  closeConnectModal();
+}
+
+
+/* ============ SCENARIO REPLAY ============ */
+function openScenarioFile() { document.getElementById("scenarioFileInput").click(); }
+
+document.getElementById("scenarioFileInput").addEventListener("change", async e => {
+  const file = e.target.files?.[0];
+  if (!file) return;
+  try {
+    const text   = await file.text();
+    const parsed = parseScenarioText(text, file.name);
+    if (!parsed.ok) { log(`[ERR] Scenario parse failed: ${parsed.error}`); e.target.value = ""; return; }
+    scenario.name   = parsed.name;
+    scenario.events = parsed.events.sort((a,b) => (a.t??0) - (b.t??0));
+    scenario.idx    = 0; scenario.playing = false;
+    scenarioLoaded  = scenario.events.length > 0;
+    document.getElementById("sourceLabel").textContent      = `Replay: ${scenario.name}`;
+    document.getElementById("sourceStatusItem").textContent = `Loaded (${scenario.events.length} events)`;
+    log(`[OK] Scenario loaded: ${scenario.name} (${scenario.events.length} events)`);
+    const first = scenario.events.find(ev => ev.lat != null && ev.lon != null);
+    if (first) applyTelemetry(first);
+  } catch (err) {
+    log(`[ERR] Failed reading file: ${err?.message || err}`);
+  } finally {
+    e.target.value = "";
+  }
+});
+
+function parseScenarioText(text, fallback = "scenario") {
+  try {
+    const obj = JSON.parse(text);
+    if (Array.isArray(obj)) return { ok:true, name:fallback, events:obj };
+    if (obj?.events) return { ok:true, name:obj.name||fallback, events:obj.events };
+  } catch {}
+  const lines  = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+  const events = [];
+  for (let i = 0; i < lines.length; i++) {
+    try { events.push(JSON.parse(lines[i])); }
+    catch { return { ok:false, error:`Bad JSONL at line ${i+1}` }; }
+  }
+  return events.length ? { ok:true, name:fallback, events } : { ok:false, error:"Empty file" };
+}
+
+function applyTelemetry(ev) {
+  if (ev.alert) log(`[${(ev.level||"info").toUpperCase()}] ALERT: ${ev.alert}${ev.note?" — "+ev.note:""}`);
+  if (ev.state) log(`[STATE] ${ev.state}${ev.note?" — "+ev.note:""}`);
+  if (ev.lat != null && ev.lon != null) {
+    log(`[GPS] lat=${ev.lat}, lon=${ev.lon}`);
+    setDroneTargetFromGps(Number(ev.lat), Number(ev.lon));
+  }
+}
+
+function startScenario() {
+  if (!scenarioLoaded)    { log("[ERR] No scenario loaded. Use Source → Load scenario…"); return; }
+  if (scenario.playing)  return;
+  scenario.playing   = true;
+  scenario.startPerf = performance.now();
+  log("[INFO] Scenario started"); setStatus("Scenario playing", true);
+  tickScenario();
+}
+function pauseScenario() {
+  if (!scenario.playing) return;
+  scenario.playing = false;
+  if (scenario.raf) cancelAnimationFrame(scenario.raf);
+  scenario.raf = null;
+  log("[INFO] Scenario paused"); setStatus("Scenario paused", false);
+}
+function stopScenario() {
+  scenario.playing = false;
+  if (scenario.raf) cancelAnimationFrame(scenario.raf);
+  scenario.raf = null; scenario.idx = 0;
+  log("[INFO] Scenario stopped (rewind)"); setStatus("Scenario stopped", false);
+  const first = scenario.events.find(ev => ev.lat != null && ev.lon != null);
+  if (first) applyTelemetry(first);
+}
+function tickScenario() {
+  if (!scenario.playing) return;
+  const t = (performance.now() - scenario.startPerf) / 1000;
+  while (scenario.idx < scenario.events.length && (scenario.events[scenario.idx].t??0) <= t)
+    applyTelemetry(scenario.events[scenario.idx++]);
+  if (scenario.idx >= scenario.events.length) {
+    scenario.playing = false;
+    log("[OK] Scenario finished");
+    setStatus("Scenario finished", true);
+    return;
+  }
+  scenario.raf = requestAnimationFrame(tickScenario);
+}
+
+/* ============ INIT ============ */
+setMapMode("select");
+renderMissionMenu();
+log("[OK] SDP Console ready. Type /help for commands.");
+</script>
+
+</body>
+</html>

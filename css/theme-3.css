@@ -1,0 +1,20 @@
+:root{
+  --bg: #21212e;
+  --panel: #161627;
+  --topbar: #302c47;
+  --border: #09080d;
+  --text: #918aba;
+  --muted: #63599d;
+  --btn-bg: #25203e;
+  --terminal-bg: #0f0d1a;
+
+  --font-ui: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+             "Cascadia Code", "Cascadia Mono", "JetBrains Mono",
+             "Fira Code", "Source Code Pro", "Liberation Mono",
+             "Courier New", monospace;
+
+  --font-weight: 300;          /* slightly “chubby” */
+  --font-style: normal;
+  --font-variant: normal;      /* small-caps looks weird in monospace */
+  --text-transform: none;
+}

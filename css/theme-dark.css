@@ -1,0 +1,16 @@
+:root {
+  --bg: #1e1e1e;
+  --panel: #252526;
+  --topbar: #2d2d30;
+  --border: #3c3c3c;
+
+  --text: #d4d4d4;
+  --muted: #9da0a6;
+
+  --btn-bg: #3c3c3c;
+  --terminal-bg: #1e1e1e;
+
+  --font-ui: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+             "Cascadia Code", "Cascadia Mono", "JetBrains Mono", "Fira Code",
+             "Source Code Pro", "Liberation Mono", "Courier New", monospace;
+             }

@@ -48,16 +48,16 @@
 }
 
 [data-theme="Abyss"] {
-  --bg:           #0e0820;
-  --surface:      #160f30;
-  --surface-2:    #251f3a;
-  --border:       #2a1f54;
-  --border-light: #3a2d6a;
-  --text:         #d4c8f0;
-  --muted:        #7767af;
-  --accent:       #3dffa1;
-  --accent-dim:   rgba(196,120,255,.14);
-  --accent-glow:  rgba(196,120,255,.28);
+  --bg:           #000009;
+  --surface:      #05001d;
+  --surface-2:    #0000008e;
+  --border:       #0c003c;
+  --border-light: #10082c;
+  --text:         #6464c2;
+  --muted:        #353e9e;
+  --accent:       #bc3d6bb9;
+  --accent-dim:   rgba(203, 75, 223, 0.14);
+  --accent-glow:  #1115d4;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -364,7 +364,7 @@ button { cursor: pointer; }
 .panel-body { padding: 10px; flex: 1; display: flex; flex-direction: column; min-height: 0; }
 
 /* ============ Map panel ============ */
-.panel-map { grid-row: 1; min-height: 380px; }
+.panel-map { grid-row: 1; min-height: 400px; }
 
 .map-stage {
   flex: 1;
@@ -1264,7 +1264,7 @@ button { cursor: pointer; }
   <div class="modal-backdrop" onclick="closeMapCreationModal()"></div>
   <div class="modal-card modal-card--xl">
     <div class="modal-header">
-      <div class="modal-title">Map Creation - Tree Detection &amp; Selection</div>
+      <div class="modal-title">Map &amp; Mission Creation Tool</div>
       <button class="btn" onclick="closeMapCreationModal()">✕ Close</button>
     </div>
     <div class="modal-body">
@@ -1367,7 +1367,7 @@ button { cursor: pointer; }
         <div class="label" style="margin-bottom:6px;">Computed Order</div>
         <div id="missionPathOrder"></div>
         <div class="flex gap-6" style="margin-top:10px;">
-          <button class="btn btn-sm flex-1" onclick="requestMissionSave()">💾 Save</button>
+          <button class="btn btn-sm flex-1" onclick="requestMissionSave()">Save</button>
           <button class="btn btn-sm btn-accent flex-1" onclick="requestMissionActivate()">Activate →</button>
         </div>
       </div>

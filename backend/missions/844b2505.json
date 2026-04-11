@@ -1,0 +1,63 @@
+{
+  "name": "Test_Mission",
+  "trees": [
+    {
+      "id": 0,
+      "cx": 321,
+      "cy": 264,
+      "w": 36,
+      "h": 36,
+      "manual": true
+    },
+    {
+      "id": 1,
+      "cx": 321,
+      "cy": 373,
+      "w": 36,
+      "h": 36,
+      "manual": true
+    },
+    {
+      "id": 2,
+      "cx": 485,
+      "cy": 307,
+      "w": 36,
+      "h": 36,
+      "manual": true
+    }
+  ],
+  "order": [
+    0,
+    1,
+    2
+  ],
+  "waypoints": [
+    {
+      "cx": 321,
+      "cy": 264,
+      "h": 36,
+      "id": 0,
+      "manual": true,
+      "w": 36
+    },
+    {
+      "cx": 321,
+      "cy": 373,
+      "h": 36,
+      "id": 1,
+      "manual": true,
+      "w": 36
+    },
+    {
+      "cx": 485,
+      "cy": 307,
+      "h": 36,
+      "id": 2,
+      "manual": true,
+      "w": 36
+    }
+  ],
+  "farm": "ARS_Test1",
+  "id": "844b2505",
+  "createdAt": "2026-04-11T21:35:53.013979"
+}
